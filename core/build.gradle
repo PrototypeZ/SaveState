@@ -1,5 +1,5 @@
 apply plugin: 'java-library'
-
+apply plugin: 'maven'
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 }
