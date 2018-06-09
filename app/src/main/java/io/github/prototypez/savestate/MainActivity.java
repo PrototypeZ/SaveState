@@ -27,16 +27,24 @@ public class MainActivity extends AppCompatActivity {
     String data;
 
     @AutoRestore
-    List<User<Integer>> stringList;
+    List<User> stringList;
 
-    Response<List<User<Integer>>> response;
+    @AutoRestore
+    List list;
+
+    @AutoRestore
+    User<Integer> user;
+
+    @AutoRestore
+    User user2;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        stringList = new ArrayList<User<Integer>>();
+        stringList = new ArrayList<User>();
         stringList.add(new User<>("jack", 16));
         stringList.add(new User<>("rose", 18));
 
@@ -51,13 +59,7 @@ public class MainActivity extends AppCompatActivity {
         Log.i("SaveState", list.toString());
 
 
-        Response<List<User<Integer>>> response = new Response<>(200, stringList);
-
-        json = gson.toJson(response);
-
-
-//        Log.i("SaveState", parsedResponse.toString());
-    }
+}
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
