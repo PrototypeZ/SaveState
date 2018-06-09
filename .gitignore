@@ -9,3 +9,6 @@
 /captures
 .externalNativeBuild
 .idea/
+repo
+build/
+out/
