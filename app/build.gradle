@@ -1,9 +1,5 @@
 apply plugin: 'com.android.application'
-//apply plugin: 'SaveState'
-
-//saveState {
-//    serializer = "gson"
-//}
+apply plugin: 'SaveState'
 
 android {
     compileSdkVersion 27
@@ -14,6 +10,12 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [ serializer : "gson" ]
+            }
+        }
     }
     buildTypes {
         release {
@@ -26,7 +28,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    annotationProcessor project(':processor')
     implementation 'com.google.code.gson:gson:2.8.4'
     testImplementation 'junit:junit:4.12'
     implementation project(":core")

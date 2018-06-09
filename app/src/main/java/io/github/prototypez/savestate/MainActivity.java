@@ -2,16 +2,8 @@ package io.github.prototypez.savestate;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 
-import io.github.prototypez.savestate.core.ParameterizedTypeHelper;
 import io.github.prototypez.savestate.core.annotation.AutoRestore;
 
 public class MainActivity extends AppCompatActivity {
@@ -21,6 +13,7 @@ public class MainActivity extends AppCompatActivity {
 
     @AutoRestore
     int b;
+
     long c;
 
     @AutoRestore
@@ -44,22 +37,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        stringList = new ArrayList<User>();
-        stringList.add(new User<>("jack", 16));
-        stringList.add(new User<>("rose", 18));
-
-        Gson gson = new Gson();
-
-        String json = gson.toJson(stringList);
-
-        Log.i("SaveState", json);
-
-        List<User<Integer>> list = gson.fromJson(json, new ParameterizedTypeHelper(List.class, null, new Class[]{User.class, Integer.class}));
-
-        Log.i("SaveState", list.toString());
-
-
-}
+    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
