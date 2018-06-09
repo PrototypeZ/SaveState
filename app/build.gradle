@@ -1,9 +1,9 @@
 apply plugin: 'com.android.application'
-apply plugin: 'SaveState'
+//apply plugin: 'SaveState'
 
-saveState {
-    serializer = "gson"
-}
+//saveState {
+//    serializer = "gson"
+//}
 
 android {
     compileSdkVersion 27
