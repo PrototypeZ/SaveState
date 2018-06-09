@@ -1,9 +1,6 @@
 package io.github.prototypez.savestate.processor;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;

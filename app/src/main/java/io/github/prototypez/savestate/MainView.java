@@ -1,7 +1,6 @@
 package io.github.prototypez.savestate;
 
 import android.content.Context;
-import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
