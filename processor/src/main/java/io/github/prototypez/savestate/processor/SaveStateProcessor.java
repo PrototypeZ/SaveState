@@ -1,5 +1,7 @@
 package io.github.prototypez.savestate.processor;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.google.auto.service.AutoService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -182,7 +184,8 @@ public class SaveStateProcessor extends AbstractProcessor {
                     statement = String.format("%s.putString(%s, %s)", bundleName, "\"" + varName + "\"", "serializer.toJson(" + instance + "." + varName + ")");
                     methodBuilder.addStatement(statement);
                 } else if (SERIALIZER_FASTJSON.equals(serializer)) {
-                    // TODO
+                    statement = String.format("%s.putString(%s, %s)", bundleName, "\"" + varName + "\"", "$T.toJSONString(" + instance + "." + varName + ")");
+                    methodBuilder.addStatement(statement, JSON.class);
                 }
         }
         return methodBuilder;
@@ -205,7 +208,8 @@ public class SaveStateProcessor extends AbstractProcessor {
                     statement = String.format("%s = serializer.fromJson(%s.getString(%s), new $T<%s>(){}.getType())", instance + "." + varName, bundleName, "\"" + varName + "\"", element.asType().toString());
                     methodBuilder.addStatement(statement, TypeToken.class);
                 } else if (SERIALIZER_FASTJSON.equals(serializer)) {
-                    // TODO
+                    statement = String.format("%s = $T.parseObject(%s.getString(%s), new $T<%s>(){}.getType())", instance + "." + varName, bundleName, "\"" + varName + "\"", element.asType().toString());
+                    methodBuilder.addStatement(statement, JSON.class, TypeReference.class);
                 }
         }
         return methodBuilder;

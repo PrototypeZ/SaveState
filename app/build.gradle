@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-apply plugin: 'SaveState'
+apply plugin: 'save.state'
 
 android {
     compileSdkVersion 27
@@ -13,7 +13,7 @@ android {
 
         javaCompileOptions {
             annotationProcessorOptions {
-                arguments = [ serializer : "gson" ]
+                arguments = [ serializer : "fastjson" ]
             }
         }
     }
@@ -30,8 +30,7 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:27.1.1'
     annotationProcessor project(':processor')
     implementation 'com.google.code.gson:gson:2.8.4'
+    implementation 'com.alibaba:fastjson:1.1.68.android'
     testImplementation 'junit:junit:4.12'
     implementation project(":core")
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }

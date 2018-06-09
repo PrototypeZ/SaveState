@@ -5,6 +5,7 @@ dependencies {
     implementation 'com.google.auto.service:auto-service:1.0-rc4'
     implementation 'com.squareup:javapoet:1.8.0'
     implementation 'com.google.code.gson:gson:2.8.4'
+    implementation 'com.alibaba:fastjson:1.1.68.android'
     implementation project(':core')
 }
 
