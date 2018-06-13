@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Size;
 import android.util.SizeF;
+import android.util.SparseArray;
 
 import java.io.Serializable;
 import java.util.List;
@@ -85,6 +86,48 @@ public class MainActivity extends AppCompatActivity {
 
     @AutoRestore
     SizeF sizeF;
+
+    @AutoRestore
+    byte[] byteArray;
+
+//    @AutoRestore
+//    Byte[] byteArray2;
+
+    @AutoRestore
+    short[] shortArray;
+
+//    @AutoRestore
+//    Short[] shortArray2;
+
+    @AutoRestore
+    char[] charArray;
+
+//    @AutoRestore
+//    Character[] charArray2;
+
+    @AutoRestore
+    float[] floatArray;
+
+//    @AutoRestore
+//    Float[] floatArray2;
+
+    @AutoRestore
+    CharSequence[] charSequenceArray;
+
+    @AutoRestore
+    Parcelable[] parcelableArray;
+
+
+
+
+
+
+    @AutoRestore
+    SparseArray<String> stringSparseArray;
+
+
+
+
 
 
     @AutoRestore

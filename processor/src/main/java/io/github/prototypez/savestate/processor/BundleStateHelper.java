@@ -72,6 +72,24 @@ class BundleStateHelper {
             case "android.util.SizeF":
                 statement = String.format("%s.putSizeF(%s, %s)", bundleName, "\"" + varName + "\"", instance + "." + varName);
                 break;
+            case "android.os.Parcelable[]":
+                statement = String.format("%s.putParcelableArray(%s, %s)", bundleName, "\"" + varName + "\"", instance + "." + varName);
+                break;
+            case "byte[]":
+                statement = String.format("%s.putByteArray(%s, %s)", bundleName, "\"" + varName + "\"", instance + "." + varName);
+                break;
+            case "short[]":
+                statement = String.format("%s.putShortArray(%s, %s)", bundleName, "\"" + varName + "\"", instance + "." + varName);
+                break;
+            case "char[]":
+                statement = String.format("%s.putCharArray(%s, %s)", bundleName, "\"" + varName + "\"", instance + "." + varName);
+                break;
+            case "float[]":
+                statement = String.format("%s.putFloatArray(%s, %s)", bundleName, "\"" + varName + "\"", instance + "." + varName);
+                break;
+            case "java.lang.CharSequence[]":
+                statement = String.format("%s.putCharSequenceArray(%s, %s)", bundleName, "\"" + varName + "\"", instance + "." + varName);
+                break;
             default:
                 if (SERIALIZER_GSON.equals(serializer)) {
                     statement = String.format("%s.putString(%s, %s)", bundleName, "\"" + varName + "\"", "serializer.toJson(" + instance + "." + varName + ")");
@@ -144,6 +162,24 @@ class BundleStateHelper {
                 break;
             case "android.util.SizeF":
                 statement = String.format("%s = %s.getSizeF(%s)", instance + "." + varName, bundleName, "\"" + varName + "\"");
+                break;
+            case "android.os.Parcelable[]":
+                statement = String.format("%s = %s.getParcelableArray(%s)", instance + "." + varName, bundleName, "\"" + varName + "\"");
+                break;
+            case "byte[]":
+                statement = String.format("%s = %s.getByteArray(%s)", instance + "." + varName, bundleName, "\"" + varName + "\"");
+                break;
+            case "short[]":
+                statement = String.format("%s = %s.getShortArray(%s)", instance + "." + varName, bundleName, "\"" + varName + "\"");
+                break;
+            case "char[]":
+                statement = String.format("%s = %s.getCharArray(%s)", instance + "." + varName, bundleName, "\"" + varName + "\"");
+                break;
+            case "float[]":
+                statement = String.format("%s = %s.getFloatArray(%s)", instance + "." + varName, bundleName, "\"" + varName + "\"");
+                break;
+            case "java.lang.CharSequence[]":
+                statement = String.format("%s = %s.getCharSequenceArray(%s)", instance + "." + varName, bundleName, "\"" + varName + "\"");
                 break;
             default:
                 if (SERIALIZER_GSON.equals(serializer)) {
