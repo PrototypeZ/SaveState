@@ -1,7 +1,7 @@
 # SaveState
 ![](https://raw.githubusercontent.com/PrototypeZ/SaveState/master/logo.png)
 
-自动恢复 Activity、Fragment 以及 View 的状态
+自动恢复 Activity、Fragment 以及 View 的状态, 无需任何类似 `onSaveInstanceState` 以及 `onRestoreInstance` 的模板代码
 
 ## 如何使用
 
