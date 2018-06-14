@@ -1,13 +1,13 @@
 # SaveState
 ![](https://raw.githubusercontent.com/PrototypeZ/SaveState/master/logo.png)
 
-自动恢复 Activity、Fragment 以及 View 的状态, 无需任何类似 `onSaveInstanceState` 以及 `onRestoreInstance` 的模板代码
+自动恢复 Activity、Fragment 以及 View 的状态, 无需任何类似 `onSaveInstanceState` 以及 `onRestoreInstanceState` 的模板代码
 
 ## 如何使用
 
 在需要自动恢复的变量上标记 `@AutoRestore` 注解。
 
-### 在 Activity 中使用：
+#### 在 Activity 中使用：
 
 ```java
 public class MyActivity extends Activity {
@@ -28,7 +28,7 @@ public class MyActivity extends Activity {
 }
 ```
 
-### 在 Fragment 中使用：
+#### 在 Fragment 中使用：
 
 
 ```java
@@ -49,7 +49,7 @@ public class MyFragment extends Fragment {
 ```
 
 
-### 在自定义 View 中使用：
+#### 在自定义 View 中使用：
 
 
 ```java
