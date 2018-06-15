@@ -1,5 +1,16 @@
 apply plugin: 'java-library'
 apply plugin: 'maven'
+apply plugin: 'com.novoda.bintray-release'
+
+publish {
+    userOrg = 'prototypez'
+    groupId = 'io.github.prototypez'
+    artifactId = 'save-state-core'
+    publishVersion = '0.1'
+    desc = 'SaveInstanceState for your application automatically'
+    website = 'https://github.com/PrototypeZ/SaveState'
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 }

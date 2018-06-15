@@ -1,12 +1,22 @@
 apply plugin: 'java-library'
+apply plugin: 'com.novoda.bintray-release'
+
+publish {
+    userOrg = 'prototypez'
+    groupId = 'io.github.prototypez'
+    artifactId = 'save-state-processor'
+    publishVersion = '0.1'
+    desc = 'SaveInstanceState for your application automatically'
+    website = 'https://github.com/PrototypeZ/SaveState'
+}
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.google.auto.service:auto-service:1.0-rc4'
-    implementation 'com.squareup:javapoet:1.8.0'
-    implementation 'com.google.code.gson:gson:2.8.4'
-    implementation 'com.alibaba:fastjson:1.1.68.android'
-    implementation project(':core')
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.google.auto.service:auto-service:1.0-rc4'
+    compile 'com.squareup:javapoet:1.8.0'
+    compile 'com.google.code.gson:gson:2.8.4'
+    compile 'com.alibaba:fastjson:1.1.68.android'
+    compile project(':core')
 }
 
 sourceCompatibility = "1.7"
