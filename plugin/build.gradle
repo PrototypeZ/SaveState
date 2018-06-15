@@ -1,8 +1,9 @@
 group 'io.github.prototypez'
-version '1.0'
+version '0.1'
 
 apply plugin: 'groovy'
 apply plugin: 'maven'
+apply plugin: 'com.novoda.bintray-release'
 
 repositories {
     mavenCentral()
@@ -10,19 +11,22 @@ repositories {
     maven { url 'https://maven.google.com'}
 }
 
+publish {
+    userOrg = 'prototypez'
+    groupId = 'io.github.prototypez'
+    artifactId = 'save-state'
+    publishVersion = '0.1'
+    desc = 'SaveInstanceState for your application automatically'
+    website = 'https://github.com/PrototypeZ/SaveState'
+}
+
 dependencies {
     compile gradleApi()
     compile localGroovy()
-//    compile 'com.android.tools.build:gradle-api:2.3.0'
     compile 'com.android.tools.build:gradle-api:3.1.2'
     compile 'javassist:javassist:3.12.1.GA'
-//    compile 'com.github.PrototypeZ.SaveState:core:00f3b8e'
-//    compile 'com.github.PrototypeZ:SaveState:55b7872'
     compile 'com.github.PrototypeZ:SaveState:55b7872'
-//    compile 'com.github.PrototypeZ:SaveState:b3f5577'
     compile 'commons-io:commons-io:2.6'
-
-//    compile 'com.github.PrototypeZ.AppJoint:core:da12c50'
 }
 
 uploadArchives {
