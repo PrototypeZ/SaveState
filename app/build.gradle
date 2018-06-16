@@ -11,11 +11,11 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = [ serializer : "fastjson" ]
-            }
-        }
+//        javaCompileOptions {
+//            annotationProcessorOptions {
+//                arguments = [ serializer : "fastjson" ]
+//            }
+//        }
     }
     buildTypes {
         release {
@@ -28,9 +28,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:27.1.1'
-    annotationProcessor project(':processor')
     implementation 'com.google.code.gson:gson:2.8.4'
     implementation 'com.alibaba:fastjson:1.1.68.android'
     testImplementation 'junit:junit:4.12'
-    implementation project(":core")
 }
