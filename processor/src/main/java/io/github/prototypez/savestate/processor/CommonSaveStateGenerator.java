@@ -53,19 +53,21 @@ public class CommonSaveStateGenerator implements Generator {
         TypeSpec.Builder saveStateClass = TypeSpec.classBuilder(className + "AutoSaveState")
                 .addModifiers(Modifier.PUBLIC);
 
-        switch (serializer) {
-            case SERIALIZER_GSON:
-                FieldSpec serializerField = FieldSpec.builder(
-                        Gson.class,
-                        "serializer",
-                        Modifier.STATIC, Modifier.FINAL
-                )
-                        .initializer("new $T()", Gson.class)
-                        .build();
-                saveStateClass.addField(serializerField);
-                break;
-            case SERIALIZER_FASTJSON:
+        if (serializer != null) {
+            switch (serializer) {
+                case SERIALIZER_GSON:
+                    FieldSpec serializerField = FieldSpec.builder(
+                            Gson.class,
+                            "serializer",
+                            Modifier.STATIC, Modifier.FINAL
+                    )
+                            .initializer("new $T()", Gson.class)
+                            .build();
+                    saveStateClass.addField(serializerField);
+                    break;
+                case SERIALIZER_FASTJSON:
 //                serializerType
+            }
         }
 
 
