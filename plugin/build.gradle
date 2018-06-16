@@ -1,15 +1,26 @@
 group 'io.github.prototypez'
-version '0.1.1'
+version '0.1.2'
 
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'com.novoda.bintray-release'
 
+buildscript {
+
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.novoda:bintray-release:0.8.1'
+    }
+}
+
 publish {
     userOrg = 'prototypez'
     groupId = 'io.github.prototypez'
     artifactId = 'save-state'
-    publishVersion = '0.1.1'
+    publishVersion = '0.1.2'
     desc = 'SaveInstanceState for your application automatically'
     website = 'https://github.com/PrototypeZ/SaveState'
 }
@@ -21,11 +32,13 @@ dependencies {
     compile 'javassist:javassist:3.12.1.GA'
     compile 'commons-io:commons-io:2.6'
     compile project(':core')
+//    compile 'io.github.prototypez:save-state-core:0.1'
 }
 
 uploadArchives {
     repositories {
         mavenDeployer {
+            pom.artifactId = 'save-state'
             repository(url: uri('../../repo'))
         }
     }

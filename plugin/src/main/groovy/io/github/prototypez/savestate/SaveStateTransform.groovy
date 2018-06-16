@@ -38,6 +38,7 @@ class SaveStateTransform extends Transform {
 
         return Sets.immutableEnumSet(
                 QualifiedContent.Scope.PROJECT,
+                QualifiedContent.Scope.SUB_PROJECTS,
                 QualifiedContent.Scope.EXTERNAL_LIBRARIES)
     }
 
@@ -54,7 +55,7 @@ class SaveStateTransform extends Transform {
         transformInvocation.inputs.each { input ->
 
             input.jarInputs.each { jarInput ->
-                mProject.logger.warn("jar input:" + jarInput.file.getAbsolutePath())
+//                mProject.logger.warn("jar input:" + jarInput.file.getAbsolutePath())
                 classPool.appendClassPath(jarInput.file.absolutePath)
 
                 def jarName = jarInput.name
@@ -63,7 +64,7 @@ class SaveStateTransform extends Transform {
                 }
 
                 def dest = transformInvocation.outputProvider.getContentLocation(jarName, jarInput.contentTypes, jarInput.scopes, Format.JAR)
-                mProject.logger.warn("jar output path:" + dest.getAbsolutePath())
+//                mProject.logger.warn("jar output path:" + dest.getAbsolutePath())
                 FileUtils.copyFile(jarInput.file, dest)
             }
 
@@ -106,23 +107,24 @@ class SaveStateTransform extends Transform {
         CtClass fragmentCtClass = classPool.get("android.app.Fragment")
         CtClass viewCtClass = classPool.get("android.view.View")
 
-
         classPool.importPackage("android.os")
         classPool.importPackage("android.util")
 
         CtClass ctClass = classPool.makeClass(new FileInputStream(file))
-        mProject.logger.warn("processing class:" + ctClass.getName())
         // Support Activity and AppCompatActivity
         boolean handled
         if (ctClass.subclassOf(activityCtClass) || ctClass.subclassOf(fragmentActivityCtClass)) {
+//            mProject.logger.warn("save-state checking activity class:" + ctClass.getName())
             ActivitySaveStateTransform transform = new ActivitySaveStateTransform(mProject, ctClass, classPool)
             transform.handleActivitySaveState()
             handled = true
         } else if (ctClass.subclassOf(fragmentCtClass) || ctClass.subclassOf(v4FragmentCtClass)) {
+//            mProject.logger.warn("save-state checking fragment class:" + ctClass.getName())
             FragmentSaveStateTransform transform = new FragmentSaveStateTransform(ctClass, classPool, mProject)
             transform.handleFragmentSaveState()
             handled = true
         } else if (ctClass.subclassOf(viewCtClass)) {
+//            mProject.logger.warn("save-state checking view class:" + ctClass.getName())
             ViewSaveStateTransform transform = new ViewSaveStateTransform(ctClass, classPool, mProject)
             transform.handleViewSaveState()
             handled = true
