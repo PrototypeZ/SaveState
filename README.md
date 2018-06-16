@@ -1,4 +1,5 @@
 # SaveState
+[ ![Download](https://api.bintray.com/packages/prototypez/maven/save-state/images/download.svg) ](https://bintray.com/prototypez/maven/save-state/_latestVersion)
 ![](https://raw.githubusercontent.com/PrototypeZ/SaveState/master/logo.png)
 
 自动恢复 Activity、Fragment 以及 View 的状态, 无需任何类似 `onSaveInstanceState` 以及 `onRestoreInstanceState` 的模板代码
