@@ -92,13 +92,27 @@ class BundleStateHelper {
                 break;
             default:
                 if (SERIALIZER_GSON.equals(serializer)) {
-                    statement = String.format("%s.putString(%s, %s)", bundleName, "\"" + varName + "\"", "serializer.toJson(" + instance + "." + varName + ")");
+                    statement = String.format(
+                            "%s.putString(%s, %s)",
+                            bundleName,
+                            "\"" + varName + "\"",
+                            "serializer.toJson(" + instance + "." + varName + ")"
+                    );
+                    methodBuilder.addStatement(statement);
+                    statement = null;
                 } else if (SERIALIZER_FASTJSON.equals(serializer)) {
-                    statement = String.format("%s.putString(%s, %s)", bundleName, "\"" + varName + "\"", "$T.toJSONString(" + instance + "." + varName + ")");
+                    statement = String.format(
+                            "%s.putString(%s, %s)",
+                            bundleName,
+                            "\"" + varName + "\"",
+                            "$T.toJSONString(" + instance + "." + varName + ")"
+                    );
+                    methodBuilder.addStatement(statement, JSON.class);
+                    statement = null;
                 }
         }
         if (statement != null) {
-            methodBuilder.addStatement(statement, JSON.class);
+            methodBuilder.addStatement(statement);
         }
         return methodBuilder;
     }
@@ -183,14 +197,27 @@ class BundleStateHelper {
                 break;
             default:
                 if (SERIALIZER_GSON.equals(serializer)) {
-                    statement = String.format("%s = serializer.fromJson(%s.getString(%s), new $T<%s>(){}.getType())", instance + "." + varName, bundleName, "\"" + varName + "\"", element.asType().toString());
+                    statement = String.format(
+                            "%s = serializer.fromJson(%s.getString(%s), new $T<%s>(){}.getType())",
+                            instance + "." + varName, bundleName,
+                            "\"" + varName + "\"",
+                            element.asType().toString()
+                    );
                     methodBuilder.addStatement(statement, TypeToken.class);
+                    statement = null;
                 } else if (SERIALIZER_FASTJSON.equals(serializer)) {
-                    statement = String.format("%s = $T.parseObject(%s.getString(%s), new $T<%s>(){}.getType())", instance + "." + varName, bundleName, "\"" + varName + "\"", element.asType().toString());
+                    statement = String.format(
+                            "%s = $T.parseObject(%s.getString(%s), new $T<%s>(){}.getType())",
+                            instance + "." + varName, bundleName,
+                            "\"" + varName + "\"",
+                            element.asType().toString()
+                    );
+                    methodBuilder.addStatement(statement, JSON.class, TypeReference.class);
+                    statement = null;
                 }
         }
         if (statement != null) {
-            methodBuilder.addStatement(statement, JSON.class, TypeReference.class);
+            methodBuilder.addStatement(statement);
         }
         return methodBuilder;
     }
