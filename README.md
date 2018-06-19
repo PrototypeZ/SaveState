@@ -142,7 +142,7 @@ boolean/Boolean        |                |
 额外的配置操作有：
 
 1. 确保项目中已引入 **支持的`JSON`序列化库** 之一
-2. 在模块(application/library)的 `build.gradle` 中加入配置：
+2. 在模块( **com.android.application** / **com.android.library** )的 `build.gradle` 中加入配置：
 ```groovy
 defaultConfig {
 

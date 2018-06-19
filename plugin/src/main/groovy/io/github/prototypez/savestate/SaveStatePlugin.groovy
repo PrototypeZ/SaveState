@@ -8,16 +8,18 @@ class SaveStatePlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
 
-        project.dependencies {
-            implementation 'io.github.prototypez:save-state-core:0.1'
-            annotationProcessor 'io.github.prototypez:save-state-processor:0.1.1'
-//            implementation project(':core')
-//            annotationProcessor project(':processor')
-        }
+        if (project.plugins.hasPlugin("com.android.application")
+                || project.plugins.hasPlugin("com.android.library")) {
 
-        if (!project.android.getTransforms().any { it -> it instanceof SaveStateTransform }) {
-            project.extensions.create('saveState', SaveState)
-            project.android.registerTransform(new SaveStateTransform(project))
+            project.dependencies {
+                implementation 'io.github.prototypez:save-state-core:0.1'
+                annotationProcessor 'io.github.prototypez:save-state-processor:0.1.2'
+            }
+
+            if (project.plugins.hasPlugin("com.android.application")) {
+                project.extensions.create('saveState', SaveState)
+                project.android.registerTransform(new SaveStateTransform(project))
+            }
         }
     }
 }

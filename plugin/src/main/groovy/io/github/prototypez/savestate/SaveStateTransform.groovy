@@ -1,15 +1,17 @@
 package io.github.prototypez.savestate
 
-import com.android.build.api.transform.Format
-import com.android.build.api.transform.QualifiedContent
-import com.android.build.api.transform.Transform
-import com.android.build.api.transform.TransformException
-import com.android.build.api.transform.TransformInvocation
+import com.android.build.api.transform.*
 import com.google.common.collect.Sets
+import groovy.io.FileType
+import io.github.prototypez.savestate.util.Compressor
+import io.github.prototypez.savestate.util.Decompression
+import javassist.ClassPath
 import javassist.ClassPool
 import javassist.CtClass
-import org.gradle.api.Project
 import org.apache.commons.io.FileUtils
+import org.gradle.api.Project
+
+import java.lang.reflect.Constructor
 
 class SaveStateTransform extends Transform {
 
@@ -31,15 +33,17 @@ class SaveStateTransform extends Transform {
 
     @Override
     Set<QualifiedContent.Scope> getScopes() {
-//        return new HashSet<QualifiedContent.Scope>(Arrays.asList(
-//                QualifiedContent.Scope.PROJECT
-//        ))
-
-
-        return Sets.immutableEnumSet(
-                QualifiedContent.Scope.PROJECT,
-                QualifiedContent.Scope.SUB_PROJECTS,
-                QualifiedContent.Scope.EXTERNAL_LIBRARIES)
+        if (mProject.plugins.hasPlugin("com.android.application")) {
+            return Sets.immutableEnumSet(
+                    QualifiedContent.Scope.PROJECT,
+                    QualifiedContent.Scope.SUB_PROJECTS,
+                    QualifiedContent.Scope.EXTERNAL_LIBRARIES)
+        } else if (mProject.plugins.hasPlugin("com.android.library")) {
+            return Sets.immutableEnumSet(
+                    QualifiedContent.Scope.PROJECT)
+        } else {
+            return Collections.emptySet()
+        }
     }
 
     @Override
@@ -49,23 +53,80 @@ class SaveStateTransform extends Transform {
 
     @Override
     void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
+        ClassPool classPool = ClassPool.getDefault()
+
+        def classPath = []
 
         classPool.appendClassPath(mProject.android.bootClasspath[0].toString())
 
+        Class jarClassPathClazz = Class.forName("javassist.JarClassPath")
+        Constructor constructor = jarClassPathClazz.getDeclaredConstructor(String.class)
+        constructor.setAccessible(true)
+
         transformInvocation.inputs.each { input ->
+
+            def subProjectInputs = []
 
             input.jarInputs.each { jarInput ->
 //                mProject.logger.warn("jar input:" + jarInput.file.getAbsolutePath())
-                classPool.appendClassPath(jarInput.file.absolutePath)
+                ClassPath clazzPath = (ClassPath) constructor.newInstance(jarInput.file.absolutePath)
+                classPath.add(clazzPath)
+                classPool.appendClassPath(clazzPath)
+
+                def jarName = jarInput.name
+                if (jarName.endsWith(".jar")) {
+                    jarName = jarName.substring(0, jarName.length() - 4)
+                }
+//                mProject.logger.warn("jar name:" + jarName)
+                if (jarName.startsWith(":")) {
+                    // handle it later, after classpath set
+                    subProjectInputs.add(jarInput)
+                } else {
+                    def dest = transformInvocation.outputProvider.getContentLocation(jarName, jarInput.contentTypes, jarInput.scopes, Format.JAR)
+//                    mProject.logger.warn("jar output path:" + dest.getAbsolutePath())
+                    FileUtils.copyFile(jarInput.file, dest)
+                }
+            }
+
+            // Handle library project jar here
+            subProjectInputs.each { jarInput ->
 
                 def jarName = jarInput.name
                 if (jarName.endsWith(".jar")) {
                     jarName = jarName.substring(0, jarName.length() - 4)
                 }
 
-                def dest = transformInvocation.outputProvider.getContentLocation(jarName, jarInput.contentTypes, jarInput.scopes, Format.JAR)
-//                mProject.logger.warn("jar output path:" + dest.getAbsolutePath())
-                FileUtils.copyFile(jarInput.file, dest)
+                if (jarName.startsWith(":")) {
+                    // sub project
+                    File unzipDir = new File(
+                            jarInput.file.getParent(),
+                            jarName.replace(":", "") + "_unzip")
+                    if (unzipDir.exists()) {
+                        unzipDir.delete()
+                    }
+                    unzipDir.mkdirs()
+                    Decompression.uncompress(jarInput.file, unzipDir)
+
+                    File repackageFolder = new File(
+                            jarInput.file.getParent(),
+                            jarName.replace(":", "") + "_repackage"
+                    )
+
+                    FileUtils.copyDirectory(unzipDir, repackageFolder)
+
+                    unzipDir.eachFileRecurse(FileType.FILES) { File it ->
+                        if (it.name.endsWith(".class")) {
+                            checkAndTransformClass(classPool, it, repackageFolder)
+                        }
+                    }
+
+                    // re-package the folder to jar
+                    def dest = transformInvocation.outputProvider.getContentLocation(
+                            jarName, jarInput.contentTypes, jarInput.scopes, Format.JAR)
+
+                    Compressor zc = new Compressor(dest.getAbsolutePath())
+                    zc.compress(repackageFolder.getAbsolutePath())
+                }
             }
 
             input.directoryInputs.each { dirInput ->
@@ -79,7 +140,7 @@ class SaveStateTransform extends Transform {
                     if (it.isDirectory()) {
                         new File(outDir, path).mkdirs()
                     } else {
-                        boolean handled = checkAndTransformClass(it, outDir)
+                        boolean handled = checkAndTransformClass(classPool, it, outDir)
                         if (!handled) {
                             // copy the file to output location
                             new File(outDir, path).bytes = it.bytes
@@ -93,13 +154,18 @@ class SaveStateTransform extends Transform {
                     dirInput.changedFiles.keySet().each(callback)
                 }
             }
+
+
+        }
+
+        // release File Handlers in ClassPool
+        classPath.each { it ->
+            classPool.removeClassPath(it)
         }
     }
 
-    ClassPool classPool = ClassPool.getDefault()
 
-
-    boolean checkAndTransformClass(File file, File dest) {
+    boolean checkAndTransformClass(ClassPool classPool, File file, File dest) {
 
         CtClass fragmentActivityCtClass = classPool.get("android.support.v4.app.FragmentActivity")
         CtClass activityCtClass = classPool.get("android.app.Activity")
