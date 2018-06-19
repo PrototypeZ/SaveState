@@ -1,12 +1,17 @@
 # SaveState
 [ ![Download](https://api.bintray.com/packages/prototypez/maven/save-state/images/download.svg) ](https://bintray.com/prototypez/maven/save-state/_latestVersion)
+
+
 ![](https://raw.githubusercontent.com/PrototypeZ/SaveState/master/logo.png)
 
-自动恢复 Activity、Fragment 以及 View 的状态, 无需任何类似 `onSaveInstanceState` 以及 `onRestoreInstanceState` 的模板代码
+
+自动恢复 Activity、Fragment 以及 View 的状态。
+
+无需任何类似 `onSaveInstanceState` 以及 `onRestoreInstanceState` 的模板代码。
 
 ## 如何使用
 
-在需要自动恢复的变量上标记 `@AutoRestore` 注解。
+在成员变量上标记 `@AutoRestore` 注解。
 
 #### 在 Activity 中使用：
 
@@ -81,7 +86,7 @@ public class MyView extends View {
 
 ```
 
-没错，就这么简单，只需要在你在希望能自动恢复的变量上标记 `@AutoRestore` 注解。
+没错，就这么简单，只需要在变量上标记 `@AutoRestore` 注解。
 
 ## 现在就接入 SaveState
 
@@ -93,16 +98,19 @@ buildscript {
     repositories {
         google()
         jcenter()
-        maven { url 'https://jitpack.io' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.2'
-        classpath 'io.github.prototypez:save-state:1.0'
+        // your other dependencies
+
+        // dependency for save-state
+        classpath "io.github.prototypez:save-state:${latest_version}"
     }
 }
 ```
 
-在 **application** 模块或 **library** 模块应用插件：
+SaveState 当前最新版本： [ ![Download](https://api.bintray.com/packages/prototypez/maven/save-state/images/download.svg) ](https://bintray.com/prototypez/maven/save-state/_latestVersion)
+
+在使用 SaveState 的 Module ( **application** 模块或 **library** 模块 ) 应用插件：
 
 ```groovy
 apply plugin: 'com.android.application'
@@ -110,16 +118,52 @@ apply plugin: 'com.android.application'
 apply plugin: 'save.state'
 ```
 
-在 **application** 模块或 **library** 增加依赖：
+## 支持的变量类型
 
+如果被 `@AutoRestore` 标记的字段是下列类型之一，那么不需要额外的配置, SaveState 就可以帮您自动保存与恢复变量。
+
+
+基本数据类型（包装类型） | 对象           | 数组
+-----------------------|----------------|-------
+int/Integer            | Serializable   | byte[]
+long/Long              | IBinder        | short[]
+short/Short            | Bundle         | char[]
+float/Float            | CharSequence   | float[]
+double/Double          | Parcelable     | CharSequence[]
+byte/Byte              | Size           |
+char/Character         | SizeF          |
+boolean/Boolean        |                |
+
+## 自定义变量类型
+
+如果您需要自动保存与恢复的变量不属于上面类型中的任意一种，并且您的变量类型可以被序列化为 `JSON` ,
+那么 SaveState 可以通过把这个对象和与它对应的 `JSON` 字符串之间的序列化和反序列化操作, 来实现变量的自动保存与恢复。
+
+额外的配置操作有：
+
+1. 确保项目中已引入 **支持的`JSON`序列化库** 之一
+2. 在模块(application/library)的 `build.gradle` 中加入配置：
 ```groovy
-dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    // your own dependencies here...
+defaultConfig {
 
-    implementation 'io.github.PrototypeZ:SaveState:1.0'
+    // your other configs
+
+    // 配置 JSON 序列化库
+    javaCompileOptions {
+        annotationProcessorOptions {
+            arguments = [ serializer : "/*JSON库*/" ]
+        }
+    }
 }
 ```
+
+目前支持的 `JSON` 序列化库有：
+
++ [gson](https://github.com/google/gson)
++ [fastjson](https://github.com/alibaba/fastjson)
++ [jackson](https://github.com/FasterXML/jackson) (currently not available)
+
+
 
 ## LICENSE
 
