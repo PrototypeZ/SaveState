@@ -130,9 +130,9 @@ long/Long              | IBinder        | short[]
 short/Short            | Bundle         | char[]
 float/Float            | CharSequence   | float[]
 double/Double          | Parcelable     | CharSequence[]
-byte/Byte              | Size           |
+byte/Byte              | Size           | Parcelable[]
 char/Character         | SizeF          |
-boolean/Boolean        |                |
+boolean/Boolean        | String         |
 
 ## 自定义变量类型
 

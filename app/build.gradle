@@ -11,17 +11,26 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-//        javaCompileOptions {
-//            annotationProcessorOptions {
-//                arguments = [ serializer : "fastjson" ]
-//            }
-//        }
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [ serializer : "fastjson" ]
+            }
+        }
     }
+
+    dataBinding {
+        enabled = true
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
     }
 }
 
