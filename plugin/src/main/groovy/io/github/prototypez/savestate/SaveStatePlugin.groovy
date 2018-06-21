@@ -13,7 +13,7 @@ class SaveStatePlugin implements Plugin<Project> {
 
             project.dependencies {
                 implementation 'io.github.prototypez:save-state-core:0.1'
-                annotationProcessor 'io.github.prototypez:save-state-processor:0.1.2'
+                annotationProcessor 'io.github.prototypez:save-state-processor:0.1.3'
             }
 
             if (project.plugins.hasPlugin("com.android.application")) {
