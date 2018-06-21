@@ -5,7 +5,7 @@ publish {
     userOrg = 'prototypez'
     groupId = 'io.github.prototypez'
     artifactId = 'save-state-processor'
-    publishVersion = '0.1.2'
+    publishVersion = '0.1.3'
     desc = 'SaveInstanceState for your application automatically'
     website = 'https://github.com/PrototypeZ/SaveState'
 }

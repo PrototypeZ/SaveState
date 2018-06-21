@@ -17,36 +17,38 @@ class BundleStateHelper {
         String varName = element.getSimpleName().toString();
         switch (element.asType().toString()) {
             case "int":
-            case "java.lang.Integer":
                 statement = String.format("%s.putInt(%s, %s)", bundleName, "\"" + varName + "\"", instance + "." + varName);
                 break;
             case "long":
-            case "java.lang.Long":
                 statement = String.format("%s.putLong(%s, %s)", bundleName, "\"" + varName + "\"", instance + "." + varName);
                 break;
             case "char":
-            case "java.lang.Character":
                 statement = String.format("%s.putChar(%s, %s)", bundleName, "\"" + varName + "\"", instance + "." + varName);
                 break;
             case "short":
-            case "java.lang.Short":
                 statement = String.format("%s.putShort(%s, %s)", bundleName, "\"" + varName + "\"", instance + "." + varName);
                 break;
             case "byte":
-            case "java.lang.Byte":
                 statement = String.format("%s.putByte(%s, %s)", bundleName, "\"" + varName + "\"", instance + "." + varName);
                 break;
             case "float":
-            case "java.lang.Float":
                 statement = String.format("%s.putFloat(%s, %s)", bundleName, "\"" + varName + "\"", instance + "." + varName);
                 break;
             case "double":
-            case "java.lang.Double":
                 statement = String.format("%s.putDouble(%s, %s)", bundleName, "\"" + varName + "\"", instance + "." + varName);
                 break;
             case "boolean":
-            case "java.lang.Boolean":
                 statement = String.format("%s.putBoolean(%s, %s)", bundleName, "\"" + varName + "\"", instance + "." + varName);
+                break;
+            case "java.lang.Integer":
+            case "java.lang.Long":
+            case "java.lang.Character":
+            case "java.lang.Short":
+            case "java.lang.Byte":
+            case "java.lang.Float":
+            case "java.lang.Double":
+            case "java.lang.Boolean":
+                statement = String.format("%s.putSerializable(%s, %s)", bundleName, "\"" + varName + "\"", instance + "." + varName);
                 break;
             case "java.lang.String":
                 statement = String.format("%s.putString(%s, %s)", bundleName, "\"" + varName + "\"", instance + "." + varName);
@@ -122,36 +124,43 @@ class BundleStateHelper {
         String varName = element.getSimpleName().toString();
         switch (element.asType().toString()) {
             case "int":
-            case "java.lang.Integer":
                 statement = String.format("%s = %s.getInt(%s)", instance + "." + varName, bundleName, "\"" + varName + "\"");
                 break;
             case "long":
-            case "java.lang.Long":
                 statement = String.format("%s = %s.getLong(%s)", instance + "." + varName, bundleName, "\"" + varName + "\"");
                 break;
             case "char":
-            case "java.lang.Character":
                 statement = String.format("%s = %s.getChar(%s)", instance + "." + varName, bundleName, "\"" + varName + "\"");
                 break;
             case "short":
-            case "java.lang.Short":
                 statement = String.format("%s = %s.getShort(%s)", instance + "." + varName, bundleName, "\"" + varName + "\"");
                 break;
             case "byte":
-            case "java.lang.Byte":
                 statement = String.format("%s = %s.getByte(%s)", instance + "." + varName, bundleName, "\"" + varName + "\"");
                 break;
             case "float":
-            case "java.lang.Float":
                 statement = String.format("%s = %s.getFloat(%s)", instance + "." + varName, bundleName, "\"" + varName + "\"");
                 break;
             case "double":
-            case "java.lang.Double":
                 statement = String.format("%s = %s.getDouble(%s)", instance + "." + varName, bundleName, "\"" + varName + "\"");
                 break;
             case "boolean":
-            case "java.lang.Boolean":
                 statement = String.format("%s = %s.getBoolean(%s)", instance + "." + varName, bundleName, "\"" + varName + "\"");
+                break;
+            case "java.lang.Integer":
+            case "java.lang.Long":
+            case "java.lang.Character":
+            case "java.lang.Short":
+            case "java.lang.Byte":
+            case "java.lang.Float":
+            case "java.lang.Double":
+            case "java.lang.Boolean":
+                statement = String.format(
+                        "%s = (%s)%s.getSerializable(%s)",
+                        instance + "." + varName,
+                        element.asType().toString(),
+                        bundleName, "\"" + varName + "\""
+                );
                 break;
             case "java.lang.String":
                 statement = String.format("%s = %s.getString(%s)", instance + "." + varName, bundleName, "\"" + varName + "\"");
