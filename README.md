@@ -110,11 +110,16 @@ buildscript {
 
 SaveState 当前最新版本： [ ![Download](https://api.bintray.com/packages/prototypez/maven/save-state/images/download.svg) ](https://bintray.com/prototypez/maven/save-state/_latestVersion)
 
-在使用 SaveState 的 Module ( **application** 模块或 **library** 模块 ) 应用插件：
-
+然后在您的项目的 **application** 模块的 `build.gradle` 中应用插件：
 ```groovy
 apply plugin: 'com.android.application'
-// apply plugin: 'com.android.library'
+apply plugin: 'save.state'
+```
+
+如果你的项目中还有其他 **library** 模块也需要使用 SaveState，那么只需要在对应模块的 `build.gradle` 中也应用插件即可：
+
+```groovy
+apply plugin: 'com.android.library'
 apply plugin: 'save.state'
 ```
 
@@ -138,6 +143,35 @@ boolean/Boolean        | String         |
 
 如果您需要自动保存与恢复的变量不属于上面类型中的任意一种，并且您的变量类型可以被序列化为 `JSON` ,
 那么 SaveState 可以通过把这个对象和与它对应的 `JSON` 字符串之间的序列化和反序列化操作, 来实现变量的自动保存与恢复。
+
+例如自定义对象：
+
+```java
+public class User {
+    String name;
+    int age;
+}
+
+
+public class NetworkResponse<T> {
+    int resultCode;
+
+    T data
+}
+```
+
+类似这样的对象都可以通过 SaveState 来自动恢复：
+
+```java
+public class MyActivity extends Activity {
+
+    @AutoRestore
+    User user;
+
+    @AutoRestore
+    NetworkResponse<List<User>> response;
+}
+```
 
 额外的配置操作有：
 
