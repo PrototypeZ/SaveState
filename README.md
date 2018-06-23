@@ -4,16 +4,17 @@
 
 ![](https://raw.githubusercontent.com/PrototypeZ/SaveState/master/logo.png)
 
+[**中文文档**](https://github.com/PrototypeZ/SaveState/blob/master/README_zh.md)
 
-自动恢复 Activity、Fragment 以及 View 的状态。
+Automatically save and restore states of Activities, Fragments and Views.
 
-无需任何类似 `onSaveInstanceState` 以及 `onRestoreInstanceState` 的模板代码。
+No boilerplate code like `onSaveInstanceState` or `onRestoreInstanceState` any more.
 
-## 如何使用
+## Getting started
 
-在成员变量上标记 `@AutoRestore` 注解。
+Just add the `@AutoRestore` annotation to your fields that need to be saved and restored in Activities, Fragments and Views.
 
-#### 在 Activity 中使用：
+#### In Activity:
 
 ```java
 public class MyActivity extends Activity {
@@ -34,7 +35,7 @@ public class MyActivity extends Activity {
 }
 ```
 
-#### 在 Fragment 中使用：
+#### In Fragment：
 
 
 ```java
@@ -55,7 +56,7 @@ public class MyFragment extends Fragment {
 ```
 
 
-#### 在自定义 View 中使用：
+#### In View：
 
 
 ```java
@@ -86,11 +87,11 @@ public class MyView extends View {
 
 ```
 
-没错，就这么简单，只需要在变量上标记 `@AutoRestore` 注解。
+Yes, that's all.
 
-## 现在就接入 SaveState
+## Setting up the dependency of SaveState
 
-在项目根目录的 `build.gradle` 中增加以下内容：
+Add the plugin classpath to the `build.gradle` file in project root as below:
 
 ```groovy
 buildscript {
@@ -108,27 +109,28 @@ buildscript {
 }
 ```
 
-SaveState 当前最新版本： [ ![Download](https://api.bintray.com/packages/prototypez/maven/save-state/images/download.svg) ](https://bintray.com/prototypez/maven/save-state/_latestVersion)
+Currently the latest version of SaveState is: [ ![Download](https://api.bintray.com/packages/prototypez/maven/save-state/images/download.svg) ](https://bintray.com/prototypez/maven/save-state/_latestVersion)
 
-然后在您的项目的 **application** 模块的 `build.gradle` 中应用插件：
+Then apply the SaveState plugin in your `build.gradle` file of your **application** module:
+
 ```groovy
 apply plugin: 'com.android.application'
 apply plugin: 'save.state'
 ```
 
-如果你的项目中还有其他 **library** 模块也需要使用 SaveState，那么只需要在对应模块的 `build.gradle` 中也应用插件即可：
+If you have **library** modules and they also need SaveState support, then the only thing you need to do is applying the plugin in their `build.gradle` files just as the **application** module.
 
 ```groovy
 apply plugin: 'com.android.library'
 apply plugin: 'save.state'
 ```
 
-## 支持的变量类型
+## Supported Types
 
-如果被 `@AutoRestore` 标记的字段是下列类型之一，那么不需要额外的配置, SaveState 就可以帮您自动保存与恢复变量。
+If the type of a field annotated by the `@AutoRestore` annotation is one of the types below, then there's no configurations any more. SaveState will save and restore your field automatically.
 
 
-基本数据类型（包装类型） | 对象           | 数组
+Primitive types( including boxed types ) | Classes and interfaces | Array types
 -----------------------|----------------|-------
 int/Integer            | Serializable   | byte[]
 long/Long              | IBinder        | short[]
@@ -139,12 +141,12 @@ byte/Byte              | Size           | Parcelable[]
 char/Character         | SizeF          |
 boolean/Boolean        | String         |
 
-## 自定义变量类型
+## Other types
 
-如果您需要自动保存与恢复的变量不属于上面类型中的任意一种，并且您的变量类型可以被序列化为 `JSON` ,
-那么 SaveState 可以通过把这个对象和与它对应的 `JSON` 字符串之间的序列化和反序列化操作, 来实现变量的自动保存与恢复。
+If the type of a field is not included in what is listed above, but it can be serialized to `JSON` ,
+then SaveState could still save and restore it automatically by serializing it to `JSON` and deserializing the `JSON` string back to Object.
 
-例如自定义对象：
+For example：
 
 ```java
 public class User {
@@ -160,7 +162,7 @@ public class NetworkResponse<T> {
 }
 ```
 
-类似这样的对象都可以通过 SaveState 来自动恢复：
+These types are supported by SaveState according to the rule above:
 
 ```java
 public class MyActivity extends Activity {
@@ -173,25 +175,26 @@ public class MyActivity extends Activity {
 }
 ```
 
-额外的配置操作有：
+But we need extra configurations now：
 
-1. 确保项目中已引入 **支持的`JSON`序列化库** 之一
-2. 在模块( **com.android.application** / **com.android.library** )的 `build.gradle` 中加入配置：
+1. Make sure your have already included one of the dependencies of **supported `JSON` processing library** .
+2. Add compile options in the `build.gradle` file ( **application** module or  **library** module ) as below:
+
 ```groovy
 defaultConfig {
 
     // your other configs
 
-    // 配置 JSON 序列化库
+    // config the JSON processing library
     javaCompileOptions {
         annotationProcessorOptions {
-            arguments = [ serializer : "/*JSON库*/" ]
+            arguments = [ serializer : "/*Supported JSON processing library*/" ]
         }
     }
 }
 ```
 
-目前支持的 `JSON` 序列化库有：
+Currently the **supported `JSON` processing library** includes：
 
 + [gson](https://github.com/google/gson)
 + [fastjson](https://github.com/alibaba/fastjson)
@@ -199,21 +202,22 @@ defaultConfig {
 
 ## FAQ
 
-+ Q: SaveState 支持 Instant Run 吗？
++ Q: Does SaveState supports Instant Run?
 
-  A: 是的，基于 Transform API, 所以支持。
+  A: Yes，it's based on Transform API, so no problem。
 
-+ Q: 需要配置 Proguard 混淆规则吗？
++ Q: Do I need to add any Proguard rules for release?
 
-  A: 没有使用任何反射，不需要额外配置。
+  A: No, there's no reflection, so you are safe to use Proguard.
 
-+ Q: SaveState 性能如何？
++ Q: What about the performance of SaveState?
 
-  A: 当前版本基于编译时字节码修改以及 AnnotationProcessor，所以运行时性能几乎和手写是一样的，编译时因为插入了额外的任务，会稍微影响编译速度，但是根据实测，这点影响是可以忽略不计的。
+  A: It's based on byte code transforming and annotation processor, so the runtime performance is as good as other compiled code written by you.
+  It will only have a little influence on the compile time, but I think it can be ignored.
 
-+ Q: SaveState 大吗？会影响打包出来 APK 大小吗？
++ Q: What about the size of SaveState? How much will it increase the APK size?
 
-  A: SaveState 主要工作都在编译时完成，运行时没有任何依赖，不用担心影响 APK 大小。
+  A: SaveState do all the jobs at compile time，it doesn't have any runtime dependency, so it won't increase your APK size.
 
 ## LICENSE
 
