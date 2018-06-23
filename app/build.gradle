@@ -13,7 +13,7 @@ android {
 
         javaCompileOptions {
             annotationProcessorOptions {
-                arguments = [ serializer : "fastjson" ]
+                arguments = [ serializer : "jackson" ]
             }
         }
     }
@@ -39,6 +39,8 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.google.code.gson:gson:2.8.4'
     implementation 'com.alibaba:fastjson:1.1.68.android'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.8.10'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.8.10'
     testImplementation 'junit:junit:4.12'
 //    annotationProcessor project(':processor')
 //    implementation project(':core')
