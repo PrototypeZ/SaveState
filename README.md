@@ -14,7 +14,7 @@ No boilerplate code like `onSaveInstanceState` or `onRestoreInstanceState` any m
 
 Just add the `@AutoRestore` annotation to your fields that need to be saved and restored in Activities, Fragments and Views.
 
-#### In Activity:
+#### In Activities:
 
 ```java
 public class MyActivity extends Activity {
@@ -35,7 +35,7 @@ public class MyActivity extends Activity {
 }
 ```
 
-#### In Fragment：
+#### In Fragments：
 
 
 ```java
@@ -56,7 +56,7 @@ public class MyFragment extends Fragment {
 ```
 
 
-#### In View：
+#### In Views：
 
 
 ```java
@@ -144,7 +144,7 @@ boolean/Boolean        | String         |
 ## Other types
 
 If the type of a field is not included in what is listed above, but it can be serialized to `JSON` ,
-then SaveState could still save and restore it automatically by serializing it to `JSON` and deserializing the `JSON` string back to Object.
+then SaveState could still save and restore it automatically by serializing it to `JSON` and deserializing the `JSON` string back to object.
 
 For example：
 
