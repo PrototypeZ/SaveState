@@ -202,7 +202,7 @@ Currently the **supported `JSON` processing library** includes：
 
 ## FAQ
 
-+ Q: Does SaveState supports Instant Run?
++ Q: Does SaveState support Instant Run?
 
   A: Yes，it's based on Transform API, so no problem。
 
