@@ -197,7 +197,23 @@ defaultConfig {
 + [fastjson](https://github.com/alibaba/fastjson)
 + [jackson](https://github.com/FasterXML/jackson) (currently not available)
 
+## FAQ
 
++ Q: SaveState 支持 Instant Run 吗？
+
+  A: 是的，基于 Transform API, 所以支持。
+
++ Q: 需要配置 Proguard 混淆规则吗？
+
+  A: 没有使用任何反射，不需要额外配置。
+
++ Q: SaveState 性能如何？
+
+  A: 当前版本基于编译时字节码修改以及 AnnotationProcessor，所以运行时性能几乎和手写是一样的，编译时因为插入了额外的任务，会稍微影响编译速度，但是根据实测，这点影响是可以忽略不计的。
+
++ Q: SaveState 大吗？会影响打包出来 APK 大小吗？
+
+  A: SaveState 主要工作都在编译时完成，运行时没有任何依赖，不用担心影响 APK 大小。
 
 ## LICENSE
 
