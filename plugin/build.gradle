@@ -1,5 +1,5 @@
 group 'io.github.prototypez'
-version '0.1.4'
+version '0.1.5'
 
 apply plugin: 'groovy'
 apply plugin: 'maven'
@@ -20,7 +20,7 @@ publish {
     userOrg = 'prototypez'
     groupId = 'io.github.prototypez'
     artifactId = 'save-state'
-    publishVersion = '0.1.4'
+    publishVersion = '0.1.5'
     desc = 'SaveInstanceState for your application automatically'
     website = 'https://github.com/PrototypeZ/SaveState'
 }
