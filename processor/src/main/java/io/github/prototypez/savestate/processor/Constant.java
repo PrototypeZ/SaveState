@@ -10,6 +10,7 @@ public class Constant {
     static final String KEY_SERIALIZER = "serializer";
     static final String SERIALIZER_GSON = "gson";
     static final String SERIALIZER_FASTJSON = "fastjson";
+    static final String SERIALIZER_JACKSON = "jackson";
 
     static final String CLASS_ACTIVITY = "android.app.Activity";
     static final String CLASS_FRAGMENT_ACTIVITY = "android.support.v4.app.FragmentActivity";

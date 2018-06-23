@@ -1,5 +1,6 @@
 package io.github.prototypez.savestate.processor;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
@@ -20,6 +21,7 @@ import io.github.prototypez.savestate.core.annotation.AutoRestore;
 import static io.github.prototypez.savestate.processor.Constant.BUNDLE_CLASS;
 import static io.github.prototypez.savestate.processor.Constant.SERIALIZER_FASTJSON;
 import static io.github.prototypez.savestate.processor.Constant.SERIALIZER_GSON;
+import static io.github.prototypez.savestate.processor.Constant.SERIALIZER_JACKSON;
 
 public class CommonSaveStateGenerator implements Generator {
 
@@ -54,9 +56,10 @@ public class CommonSaveStateGenerator implements Generator {
                 .addModifiers(Modifier.PUBLIC);
 
         if (serializer != null) {
+            FieldSpec serializerField;
             switch (serializer) {
                 case SERIALIZER_GSON:
-                    FieldSpec serializerField = FieldSpec.builder(
+                    serializerField = FieldSpec.builder(
                             Gson.class,
                             "serializer",
                             Modifier.STATIC, Modifier.FINAL
@@ -67,6 +70,17 @@ public class CommonSaveStateGenerator implements Generator {
                     break;
                 case SERIALIZER_FASTJSON:
 //                serializerType
+                    break;
+                case SERIALIZER_JACKSON:
+                    serializerField = FieldSpec.builder(
+                            ObjectMapper.class,
+                            "serializer",
+                            Modifier.STATIC, Modifier.FINAL
+                    )
+                            .initializer("new $T()", ObjectMapper.class)
+                            .build();
+                    saveStateClass.addField(serializerField);
+                    break;
             }
         }
 

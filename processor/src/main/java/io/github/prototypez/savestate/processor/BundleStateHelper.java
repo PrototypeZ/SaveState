@@ -2,15 +2,23 @@ package io.github.prototypez.savestate.processor;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.reflect.TypeToken;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.MethodSpec;
+
+import java.io.IOException;
 
 import javax.lang.model.element.Element;
 
 import static io.github.prototypez.savestate.processor.Constant.SERIALIZER_FASTJSON;
 import static io.github.prototypez.savestate.processor.Constant.SERIALIZER_GSON;
+import static io.github.prototypez.savestate.processor.Constant.SERIALIZER_JACKSON;
 
 class BundleStateHelper {
+
+    static ClassName androidLogClassName = ClassName.get("android.util", "Log");
 
     static MethodSpec.Builder statementSaveValueIntoBundle(MethodSpec.Builder methodBuilder, Element element, String instance, String bundleName, String serializer) {
         String statement = null;
@@ -111,6 +119,23 @@ class BundleStateHelper {
                     );
                     methodBuilder.addStatement(statement, JSON.class);
                     statement = null;
+                } else if (SERIALIZER_JACKSON.equals(serializer)) {
+                    methodBuilder.addCode(
+                            CodeBlock.builder()
+                                    .beginControlFlow("try")
+                                    .addStatement(
+                                            String.format(
+                                                    "%s.putString(%s, %s)",
+                                                    bundleName,
+                                                    "\"" + varName + "\"",
+                                                    "serializer.writeValueAsString(" + instance + "." + varName + ")"
+                                            )
+                                    )
+                                    .nextControlFlow("catch($T e)", JsonProcessingException.class)
+                                    .addStatement(String.format("$T.e(\"SaveState\", \"Error in saving field %s\", e)", varName), androidLogClassName)
+                                    .endControlFlow()
+                                    .build()
+                    );
                 }
         }
         if (statement != null) {
@@ -223,6 +248,24 @@ class BundleStateHelper {
                     );
                     methodBuilder.addStatement(statement, JSON.class, TypeReference.class);
                     statement = null;
+                } else if (SERIALIZER_JACKSON.equals(serializer)) {
+                    methodBuilder.addCode(
+                            CodeBlock.builder()
+                                    .beginControlFlow("try")
+                                    .addStatement(
+                                            String.format(
+                                                    "%s = serializer.readValue(%s.getString(%s), new $T<%s>(){})",
+                                                    instance + "." + varName, bundleName,
+                                                    "\"" + varName + "\"",
+                                                    element.asType().toString()
+                                            ),
+                                            com.fasterxml.jackson.core.type.TypeReference.class
+                                    )
+                                    .nextControlFlow("catch($T e)", IOException.class)
+                                    .addStatement(String.format("$T.e(\"SaveState\", \"Error in restoring field %s\", e)", varName), androidLogClassName)
+                                    .endControlFlow()
+                                    .build()
+                    );
                 }
         }
         if (statement != null) {
