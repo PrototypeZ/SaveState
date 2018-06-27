@@ -27,10 +27,12 @@ public class CommonSaveStateGenerator implements Generator {
 
     protected Element element;
     protected String serializer;
+    private boolean isKotlinClass;
 
-    public CommonSaveStateGenerator(Element element, String serializer) {
+    public CommonSaveStateGenerator(boolean isKotlinClass, Element element, String serializer) {
         this.element = element;
         this.serializer = serializer;
+        this. isKotlinClass = isKotlinClass;
     }
 
     @Override
@@ -106,7 +108,7 @@ public class CommonSaveStateGenerator implements Generator {
                 .addModifiers(Modifier.STATIC);
 
         for (Element field : autoRestoreFields) {
-            BundleStateHelper.statementSaveValueIntoBundle(saveStateMethodBuilder,
+            BundleStateHelper.statementSaveValueIntoBundle(isKotlinClass, saveStateMethodBuilder,
                     field, "instance", "outState", serializer);
 
         }
@@ -120,7 +122,7 @@ public class CommonSaveStateGenerator implements Generator {
                 .addModifiers(Modifier.STATIC);
 
         for (Element field : autoRestoreFields) {
-            BundleStateHelper.statementGetValueFromBundle(restoreStateMethodBuilder,
+            BundleStateHelper.statementGetValueFromBundle(isKotlinClass, restoreStateMethodBuilder,
                     field, "instance", "savedInstanceState", serializer);
         }
 

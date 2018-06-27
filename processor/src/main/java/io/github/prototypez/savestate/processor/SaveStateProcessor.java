@@ -6,6 +6,7 @@ import com.squareup.javapoet.JavaFile;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,6 +17,7 @@ import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
@@ -74,14 +76,24 @@ public class SaveStateProcessor extends AbstractProcessor {
                 continue;
             }
 
+            boolean isKotlinClass = false;
+            List<? extends AnnotationMirror> list = processingEnv.getElementUtils()
+                    .getAllAnnotationMirrors(element);
+            for (int i = 0; list != null && i < list.size(); i++) {
+                if ("kotlin.Metadata".equals(((TypeElement)list.get(i).getAnnotationType().asElement()).getQualifiedName().toString())) {
+                    isKotlinClass = true;
+                    break;
+                }
+            }
+
             Generator generator;
             if (checkIsSubClassOf(
                     element,
                     Constant.CLASS_ACTIVITY, Constant.CLASS_FRAGMENT_ACTIVITY,
                     Constant.CLASS_FRAGMENT, Constant.CLASS_V4_FRAGMENT)) {
-                generator = new CommonSaveStateGenerator(element, serializer);
+                generator = new CommonSaveStateGenerator(isKotlinClass, element, serializer);
             } else if (checkIsSubClassOf(element, Constant.CLASS_VIEW)) {
-                generator = new ViewSaveStateGenerator(element, serializer);
+                generator = new ViewSaveStateGenerator(isKotlinClass, element, serializer);
             } else {
                 continue;
             }

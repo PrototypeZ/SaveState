@@ -15,8 +15,8 @@ import static io.github.prototypez.savestate.processor.Constant.SUPER_STATE;
 
 public class ViewSaveStateGenerator extends CommonSaveStateGenerator {
 
-    public ViewSaveStateGenerator(Element element, String serializer) {
-        super(element, serializer);
+    public ViewSaveStateGenerator(boolean isKotlinClass, Element element, String serializer) {
+        super(isKotlinClass, element, serializer);
     }
 
     @Override
