@@ -18,7 +18,7 @@ import static io.github.prototypez.savestate.processor.Constant.SERIALIZER_JACKS
 
 class BundleStateHelper {
 
-    static ClassName androidLogClassName = ClassName.get("android.util", "Log");
+    private static ClassName androidLogClassName = ClassName.get("android.util", "Log");
 
     static MethodSpec.Builder statementSaveValueIntoBundle(boolean isKotlinClass, MethodSpec.Builder methodBuilder, Element element, String instance, String bundleName, String serializer) {
         String statement = null;
@@ -278,7 +278,8 @@ class BundleStateHelper {
             default:
                 if (SERIALIZER_GSON.equals(serializer)) {
                     statement = assignStatement(isKotlinClass, instance, varName, String.format(
-                            "serializer.fromJson(%s.getString(%s), new $T<%s>(){}.getType())",
+                            "serializer.<%s>fromJson(%s.getString(%s), new $T<%s>(){}.getType())",
+                            element.asType().toString(),
                             bundleName,
                             "\"" + varName + "\"",
                             element.asType().toString()
@@ -287,7 +288,8 @@ class BundleStateHelper {
                     statement = null;
                 } else if (SERIALIZER_FASTJSON.equals(serializer)) {
                     statement = assignStatement(isKotlinClass, instance, varName, String.format(
-                            "$T.parseObject(%s.getString(%s), new $T<%s>(){}.getType())",
+                            "$T.<%s>parseObject(%s.getString(%s), new $T<%s>(){}.getType())",
+                            element.asType().toString(),
                             bundleName,
                             "\"" + varName + "\"",
                             element.asType().toString()
@@ -301,7 +303,8 @@ class BundleStateHelper {
                                     .addStatement(
                                             assignStatement(isKotlinClass, instance, varName,
                                                     String.format(
-                                                            "serializer.readValue(%s.getString(%s), new $T<%s>(){})",
+                                                            "serializer.<%s>readValue(%s.getString(%s), new $T<%s>(){})",
+                                                            element.asType().toString(),
                                                             bundleName,
                                                             "\"" + varName + "\"",
                                                             element.asType().toString()

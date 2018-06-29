@@ -1,6 +1,7 @@
 package io.github.prototypez.savestate.processor;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.ImmutableSet;
 import com.squareup.javapoet.JavaFile;
 
 import java.io.IOException;
@@ -15,6 +16,7 @@ import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.SupportedOptions;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
@@ -29,6 +31,7 @@ import io.github.prototypez.savestate.core.annotation.AutoRestore;
 
 @AutoService(Processor.class)
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
+@SupportedOptions({"serializer"})
 public class SaveStateProcessor extends AbstractProcessor {
 
     private String serializer;
@@ -38,6 +41,11 @@ public class SaveStateProcessor extends AbstractProcessor {
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
         messager = processingEnv.getMessager();
+    }
+
+    @Override
+    public Set<String> getSupportedOptions() {
+        return ImmutableSet.of("serializer");
     }
 
     @Override
