@@ -56,7 +56,7 @@ class MyFragment : Fragment() {
 
 
 ```kotlin
-class KotlinView : FrameLayout {
+class MyView : FrameLayout {
 
     @AutoRestore
     val someText: String? = null;
