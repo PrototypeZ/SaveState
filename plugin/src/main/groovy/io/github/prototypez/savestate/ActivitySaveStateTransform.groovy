@@ -39,8 +39,9 @@ class ActivitySaveStateTransform {
                 { it.name == Constant.ENABLE_SAVE_STATE && it.getType().name == "boolean" }
 
         def list = []
-        ctClass.fields.each { field ->
+        ctClass.declaredFields.each { field ->
             if (field.getAnnotation(AutoRestore.class) != null) {
+//                project.logger.info("field ${field.name} is AutoRestore annotated!")
                 list.add(field)
             }
         }
@@ -50,6 +51,7 @@ class ActivitySaveStateTransform {
                 ctClass.removeField(enableCtField)
                 ctClass.addField(generateEnabledField(ctClass),
                         CtField.Initializer.constant(false))
+//                project.logger.info("Last state: some, current state: none.")
             }
         } else {
             if (enableCtField == null) {
@@ -80,6 +82,7 @@ class ActivitySaveStateTransform {
                     restoreCtMethod.insertBefore(
                             "if ($Constant.ENABLE_SAVE_STATE && \$1 != null) ${ctClass.name}${Constant.GENERATED_FILE_SUFFIX}.onRestoreInstanceState(this, \$1);")
                 }
+//                project.logger.info("Last state: none, current state: some")
             }
         }
     }

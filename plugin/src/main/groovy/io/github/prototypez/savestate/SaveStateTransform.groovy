@@ -59,109 +59,108 @@ class SaveStateTransform extends Transform {
 
         classPool.appendClassPath(mProject.android.bootClasspath[0].toString())
 
-        Class jarClassPathClazz = Class.forName("javassist.JarClassPath")
-        Constructor constructor = jarClassPathClazz.getDeclaredConstructor(String.class)
-        constructor.setAccessible(true)
+        try {
+            Class jarClassPathClazz = Class.forName("javassist.JarClassPath")
+            Constructor constructor = jarClassPathClazz.getDeclaredConstructor(String.class)
+            constructor.setAccessible(true)
 
-        transformInvocation.inputs.each { input ->
+            transformInvocation.inputs.each { input ->
 
-            def subProjectInputs = []
+                def subProjectInputs = []
 
-            input.jarInputs.each { jarInput ->
-//                mProject.logger.warn("jar input:" + jarInput.file.getAbsolutePath())
-                ClassPath clazzPath = (ClassPath) constructor.newInstance(jarInput.file.absolutePath)
-                classPath.add(clazzPath)
-                classPool.appendClassPath(clazzPath)
+                input.jarInputs.each { jarInput ->
+//                mProject.logger.info("jar input:" + jarInput.file.getAbsolutePath())
+                    ClassPath clazzPath = (ClassPath) constructor.newInstance(jarInput.file.absolutePath)
+                    classPath.add(clazzPath)
+                    classPool.appendClassPath(clazzPath)
 
-                def jarName = jarInput.name
-                if (jarName.endsWith(".jar")) {
-                    jarName = jarName.substring(0, jarName.length() - 4)
-                }
-//                mProject.logger.warn("jar name:" + jarName)
-                if (jarName.startsWith(":")) {
-                    // handle it later, after classpath set
-                    subProjectInputs.add(jarInput)
-                } else {
-                    def dest = transformInvocation.outputProvider.getContentLocation(jarName, jarInput.contentTypes, jarInput.scopes, Format.JAR)
-//                    mProject.logger.warn("jar output path:" + dest.getAbsolutePath())
-                    FileUtils.copyFile(jarInput.file, dest)
-                }
-            }
-
-            // Handle library project jar here
-            subProjectInputs.each { jarInput ->
-
-                def jarName = jarInput.name
-                if (jarName.endsWith(".jar")) {
-                    jarName = jarName.substring(0, jarName.length() - 4)
-                }
-
-                if (jarName.startsWith(":")) {
-                    // sub project
-                    File unzipDir = new File(
-                            jarInput.file.getParent(),
-                            jarName.replace(":", "") + "_unzip")
-                    if (unzipDir.exists()) {
-                        unzipDir.delete()
+                    def jarName = jarInput.name
+                    if (jarName.endsWith(".jar")) {
+                        jarName = jarName.substring(0, jarName.length() - 4)
                     }
-                    unzipDir.mkdirs()
-                    Decompression.uncompress(jarInput.file, unzipDir)
+//                mProject.logger.info("jar name:" + jarName)
+                    if (jarName.startsWith(":")) {
+                        // handle it later, after classpath set
+                        subProjectInputs.add(jarInput)
+                    } else {
+                        def dest = transformInvocation.outputProvider.getContentLocation(jarName, jarInput.contentTypes, jarInput.scopes, Format.JAR)
+//                    mProject.logger.info("jar output path:" + dest.getAbsolutePath())
+                        FileUtils.copyFile(jarInput.file, dest)
+                    }
+                }
 
-                    File repackageFolder = new File(
-                            jarInput.file.getParent(),
-                            jarName.replace(":", "") + "_repackage"
-                    )
+                // Handle library project jar here
+                subProjectInputs.each { jarInput ->
 
-                    FileUtils.copyDirectory(unzipDir, repackageFolder)
+                    def jarName = jarInput.name
+                    if (jarName.endsWith(".jar")) {
+                        jarName = jarName.substring(0, jarName.length() - 4)
+                    }
 
-                    unzipDir.eachFileRecurse(FileType.FILES) { File it ->
-                        if (it.name.endsWith(".class")) {
+                    if (jarName.startsWith(":")) {
+                        // sub project
+                        File unzipDir = new File(
+                                jarInput.file.getParent(),
+                                jarName.replace(":", "") + "_unzip")
+                        if (unzipDir.exists()) {
+                            unzipDir.delete()
+                        }
+                        unzipDir.mkdirs()
+                        Decompression.uncompress(jarInput.file, unzipDir)
+
+                        File repackageFolder = new File(
+                                jarInput.file.getParent(),
+                                jarName.replace(":", "") + "_repackage"
+                        )
+
+                        FileUtils.copyDirectory(unzipDir, repackageFolder)
+
+                        unzipDir.eachFileRecurse(FileType.FILES) { File it ->
                             checkAndTransformClass(classPool, it, repackageFolder)
                         }
+
+                        // re-package the folder to jar
+                        def dest = transformInvocation.outputProvider.getContentLocation(
+                                jarName, jarInput.contentTypes, jarInput.scopes, Format.JAR)
+
+                        Compressor zc = new Compressor(dest.getAbsolutePath())
+                        zc.compress(repackageFolder.getAbsolutePath())
                     }
-
-                    // re-package the folder to jar
-                    def dest = transformInvocation.outputProvider.getContentLocation(
-                            jarName, jarInput.contentTypes, jarInput.scopes, Format.JAR)
-
-                    Compressor zc = new Compressor(dest.getAbsolutePath())
-                    zc.compress(repackageFolder.getAbsolutePath())
                 }
-            }
 
-            input.directoryInputs.each { dirInput ->
-                def outDir = transformInvocation.outputProvider.getContentLocation(dirInput.name, dirInput.contentTypes, dirInput.scopes, Format.DIRECTORY)
-                classPool.appendClassPath(dirInput.file.absolutePath)
-                // dirInput.file is like "build/intermediates/classes/debug"
-                int pathBitLen = dirInput.file.toString().length()
+                input.directoryInputs.each { dirInput ->
+                    def outDir = transformInvocation.outputProvider.getContentLocation(dirInput.name, dirInput.contentTypes, dirInput.scopes, Format.DIRECTORY)
+                    classPool.appendClassPath(dirInput.file.absolutePath)
+                    // dirInput.file is like "build/intermediates/classes/debug"
+                    int pathBitLen = dirInput.file.toString().length()
 
-                def callback = { File it ->
-                    def path = "${it.toString().substring(pathBitLen)}"
-                    if (it.isDirectory()) {
-                        new File(outDir, path).mkdirs()
-                    } else {
-                        boolean handled = checkAndTransformClass(classPool, it, outDir)
-                        if (!handled) {
-                            // copy the file to output location
-                            new File(outDir, path).bytes = it.bytes
+                    def callback = { File it ->
+                        def path = "${it.toString().substring(pathBitLen)}"
+                        if (it.isDirectory()) {
+                            new File(outDir, path).mkdirs()
+                        } else {
+                            boolean handled = checkAndTransformClass(classPool, it, outDir)
+                            if (!handled) {
+                                // copy the file to output location
+                                new File(outDir, path).bytes = it.bytes
+                            }
                         }
                     }
-                }
 
-                if (dirInput.changedFiles == null || dirInput.changedFiles.isEmpty()) {
-                    dirInput.file.traverse(callback)
-                } else {
-                    dirInput.changedFiles.keySet().each(callback)
+                    if (dirInput.changedFiles == null || dirInput.changedFiles.isEmpty()) {
+                        dirInput.file.traverse(callback)
+                    } else {
+                        dirInput.changedFiles.keySet().each(callback)
+                    }
                 }
             }
-
-
+        } finally {
+            // release File Handlers in ClassPool
+            classPath.each { it ->
+                classPool.removeClassPath(it)
+            }
         }
 
-        // release File Handlers in ClassPool
-        classPath.each { it ->
-            classPool.removeClassPath(it)
-        }
     }
 
 
@@ -176,21 +175,31 @@ class SaveStateTransform extends Transform {
         classPool.importPackage("android.os")
         classPool.importPackage("android.util")
 
-        CtClass ctClass = classPool.makeClass(new FileInputStream(file))
+        if (!file.name.endsWith("class")) {
+            return false
+        }
+
+        CtClass ctClass
+        try {
+            ctClass = classPool.makeClass(new FileInputStream(file))
+        } catch (Throwable throwable) {
+            mProject.logger.error("Parsing class file ${file.getAbsolutePath()} fail.", throwable)
+            return false
+        }
         // Support Activity and AppCompatActivity
         boolean handled
         if (ctClass.subclassOf(activityCtClass) || ctClass.subclassOf(fragmentActivityCtClass)) {
-//            mProject.logger.warn("save-state checking activity class:" + ctClass.getName())
+//            mProject.logger.info("save-state checking activity class:" + ctClass.getName())
             ActivitySaveStateTransform transform = new ActivitySaveStateTransform(mProject, ctClass, classPool)
             transform.handleActivitySaveState()
             handled = true
         } else if (ctClass.subclassOf(fragmentCtClass) || ctClass.subclassOf(v4FragmentCtClass)) {
-//            mProject.logger.warn("save-state checking fragment class:" + ctClass.getName())
+//            mProject.logger.info("save-state checking fragment class:" + ctClass.getName())
             FragmentSaveStateTransform transform = new FragmentSaveStateTransform(ctClass, classPool, mProject)
             transform.handleFragmentSaveState()
             handled = true
         } else if (ctClass.subclassOf(viewCtClass)) {
-//            mProject.logger.warn("save-state checking view class:" + ctClass.getName())
+//            mProject.logger.info("save-state checking view class:" + ctClass.getName())
             ViewSaveStateTransform transform = new ViewSaveStateTransform(ctClass, classPool, mProject)
             transform.handleViewSaveState()
             handled = true

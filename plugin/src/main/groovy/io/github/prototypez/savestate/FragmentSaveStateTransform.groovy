@@ -35,7 +35,7 @@ class FragmentSaveStateTransform {
                 { it.name == Constant.ENABLE_SAVE_STATE && it.getType().name == "boolean" }
 
         def list = []
-        ctClass.fields.each { field ->
+        ctClass.declaredFields.each { field ->
             if (field.getAnnotation(AutoRestore.class) != null) {
                 list.add(field)
             }
