@@ -139,10 +139,10 @@ apply plugin: 'save.state'
 
 
 > Note：In pure Java module，SaveState use `annotationProcessor` by default;
-In module that contains `kotlin` code，then SaveState use `kotlin-kapt` instead.
+In module that contains `kotlin` code, SaveState use `kotlin-kapt` plugin instead.
 If you are using SaveState plugin in module that contains `kotlin` code,
 please make sure other annotation processor framework are using `kapt` plugin too.
-For example, Dagger and  DeepLinkDispatch processor should included like below：
+For example, Dagger and  DeepLinkDispatch processor should be included as follows：
 > ```groovy
 > kapt "com.google.dagger:dagger-compiler:${dagger_version}"
 > kapt "com.airbnb:deeplinkdispatch-processor:${deeplinkdispatch_version}"
