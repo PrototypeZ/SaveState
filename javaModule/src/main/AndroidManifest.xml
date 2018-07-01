@@ -1,0 +1,8 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="io.github.prototypez.savestate.plain" >
+    <application>
+        <activity android:name=".activity.JavaActivity" />
+        <activity android:name=".activity.JavaFragmentActivity" />
+        <activity android:name=".activity.JavaViewActivity" />
+    </application>
+</manifest>

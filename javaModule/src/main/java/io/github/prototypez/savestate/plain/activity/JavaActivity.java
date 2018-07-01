@@ -1,4 +1,4 @@
-package io.github.prototypez.savestate.activity;
+package io.github.prototypez.savestate.plain.activity;
 
 import android.databinding.DataBindingUtil;
 import android.graphics.Point;
@@ -16,13 +16,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import io.github.prototypez.savestate.R;
 import io.github.prototypez.savestate.core.annotation.AutoRestore;
-import io.github.prototypez.savestate.databinding.ActivityMainBinding;
-import io.github.prototypez.savestate.databinding.ActivitySmartBinding;
-import io.github.prototypez.savestate.entity.User;
+import io.github.prototypez.savestate.plain.R;
+import io.github.prototypez.savestate.plain.databinding.ActivityJavaBinding;
+import io.github.prototypez.savestate.plain.entity.User;
 
-public class SmartActivity extends AppCompatActivity{
+public class JavaActivity extends AppCompatActivity{
 
     @AutoRestore
     int testInt;
@@ -120,14 +119,14 @@ public class SmartActivity extends AppCompatActivity{
     @AutoRestore
     List<User<Integer>> userList;
 
-    ActivitySmartBinding mBinding;
+    ActivityJavaBinding mBinding;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_smart);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_java);
 
         refresh();
 

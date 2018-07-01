@@ -1,1 +1,1 @@
-include ':app', ':core', ':processor', ':plugin'
+include ':app', ':core', ':processor', ':plugin', ':kotlinModule', ':javaModule'

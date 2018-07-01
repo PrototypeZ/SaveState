@@ -15,24 +15,51 @@
             tools:context="io.github.prototypez.savestate.activity.MainActivity">
 
             <Button
-                android:id="@+id/smartActivity"
+                android:id="@+id/javaActivity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Smart Activity"/>
+                android:text="Java Activity"/>
 
             <Button
-                android:id="@+id/smartFragment"
+                android:id="@+id/javaFragment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Smart Fragment"/>
+                android:text="Java Fragment"/>
 
             <Button
-                android:id="@+id/smartView"
+                android:id="@+id/javaView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Smart View"/>
+                android:text="Java View"/>
 
+            <Button
+                android:id="@+id/kotlinActivity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Kotlin Activity"/>
 
+            <Button
+                android:id="@+id/kotlinFragment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Kotlin Fragment"/>
+
+            <Button
+                android:id="@+id/kotlinView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Kotlin View"/>
+
+            <Button
+                android:id="@+id/smartKotlinActivity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Kotlin Activity In App"/>
+
+            <TextView
+                android:id="@+id/history"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
         </LinearLayout>
     </ScrollView>
 </layout>

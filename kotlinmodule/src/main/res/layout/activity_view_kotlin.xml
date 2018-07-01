@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <io.github.prototypez.savestate.SmartView
+    <io.github.prototypez.savestate.kotlin.KotlinView
         android:id="@+id/smartView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

@@ -212,7 +212,7 @@ Currently the **supported `JSON` processing library** includes：
 
 + Q: What about the performance of SaveState?
 
-  A: It's based on byte code transforming and annotation processor, so the runtime performance is as good as other compiled code written by you.
+  A: It's based on byte code transforming and annotation processor, so the runtime performance is as good as other compiled code written by yourself.
   It will only have a little influence on the compile time, but I think it can be ignored.
 
 + Q: What about the size of SaveState? How much will it increase the APK size?

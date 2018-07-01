@@ -1,4 +1,4 @@
-package io.github.prototypez.savestate;
+package io.github.prototypez.savestate.plain;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
@@ -13,21 +13,18 @@ import android.util.AttributeSet;
 import android.util.Size;
 import android.util.SizeF;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.FrameLayout;
 
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.github.prototypez.savestate.core.annotation.AutoRestore;
-import io.github.prototypez.savestate.databinding.FragmentSmartBinding;
-import io.github.prototypez.savestate.databinding.ViewSmartBinding;
-import io.github.prototypez.savestate.entity.User;
+import io.github.prototypez.savestate.plain.entity.User;
+import io.github.prototypez.savestate.plain.databinding.ViewJavaBinding;
 
-public class SmartView extends FrameLayout {
+public class JavaView extends FrameLayout {
 
     @AutoRestore
     int testInt;
@@ -125,7 +122,7 @@ public class SmartView extends FrameLayout {
     @AutoRestore
     List<User<Integer>> userList;
 
-    ViewSmartBinding mBinding;
+    ViewJavaBinding mBinding;
 
 
     private void refresh() {
@@ -169,26 +166,26 @@ public class SmartView extends FrameLayout {
 
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public SmartView(Context context) {
+    public JavaView(Context context) {
         super(context);
         init(context);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public SmartView(Context context, @Nullable AttributeSet attrs) {
+    public JavaView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public SmartView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public JavaView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void init(Context context) {
-        mBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.view_smart, this, true);
+        mBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.view_java, this, true);
         mBinding.assignValue.setOnClickListener(v -> {
             testInt = 1;
             testInt2 = 2;

@@ -1,4 +1,4 @@
-package io.github.prototypez.savestate.entity;
+package io.github.prototypez.savestate.plain.entity;
 
 public class User<T> {
     String name;

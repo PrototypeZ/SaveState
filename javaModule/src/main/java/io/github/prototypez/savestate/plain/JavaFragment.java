@@ -1,6 +1,5 @@
-package io.github.prototypez.savestate;
+package io.github.prototypez.savestate.plain;
 
-import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Point;
 import android.os.Build;
@@ -21,13 +20,12 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.github.prototypez.savestate.core.annotation.AutoRestore;
-import io.github.prototypez.savestate.databinding.FragmentSmartBinding;
-import io.github.prototypez.savestate.entity.User;
+import io.github.prototypez.savestate.plain.databinding.FragmentJavaBinding;
+import io.github.prototypez.savestate.plain.entity.User;
 
-public class SmartFragment extends Fragment {
+public class JavaFragment extends Fragment {
 
 
     @AutoRestore
@@ -126,7 +124,7 @@ public class SmartFragment extends Fragment {
     @AutoRestore
     List<User<Integer>> userList;
 
-    FragmentSmartBinding mBinding;
+    FragmentJavaBinding mBinding;
 
 
     private void refresh() {
@@ -172,7 +170,7 @@ public class SmartFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_smart, container, false);
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_java, container, false);
 
         mBinding.assignValue.setOnClickListener(v -> {
             testInt = 1;

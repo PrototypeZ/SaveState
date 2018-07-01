@@ -1,0 +1,8 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="io.github.prototypez.savestate.kotlin" >
+    <application>
+        <activity android:name=".activity.KotlinActivity"/>
+        <activity android:name=".activity.KotlinFragmentActivity"/>
+        <activity android:name=".activity.KotlinViewActivity"/>
+    </application>
+</manifest>
