@@ -16,20 +16,19 @@ Just add the `@AutoRestore` annotation to your fields that need to be saved and 
 
 #### In Activities:
 
-```java
-public class MyActivity extends Activity {
+```kotlin
+class MyActivity : Activity() {
 
     @AutoRestore
-    int myInt;
+    var myInt: Int = 0;
 
     @AutoRestore
-    IBinder myRpcCall;
+    var myRpcCall: IBinder? = null;
 
     @AutoRestore
-    String result;
+    var result: String? = null;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         // Your code here
     }
 }
@@ -38,18 +37,16 @@ public class MyActivity extends Activity {
 #### In Fragments：
 
 
-```java
-public class MyFragment extends Fragment {
+```kotlin
+class MyFragment : Fragment() {
 
     @AutoRestore
-    User currentLoginUser;
+    var currentLoginUser: User? = null;
 
     @AutoRestore
-    List<Map<String, Object>> networkResponse;
+    var networkResponse: List<Map<String, Object>>? = null;
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Your code here
     }
 }
@@ -59,32 +56,31 @@ public class MyFragment extends Fragment {
 #### In Views：
 
 
-```java
-public class MyView extends View {
+```kotlin
+class KotlinView : FrameLayout {
 
     @AutoRestore
-    String someText;
+    val someText: String? = null;
 
     @AutoRestore
-    Size size;
+    val size: Size? = null;
 
     @AutoRestore
-    float[] myFloatArray;
+    val myFloatArray: FloatArray? = null;
 
-    public MyView(Context context) {
-        super(context);
+    constructor(context: Context) : super(context) {
+        // your code here
     }
 
-    public MyView(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        // your code here
     }
 
-    public MyView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+        // your code here
     }
 
 }
-
 ```
 
 Yes, that's all.
@@ -118,12 +114,40 @@ apply plugin: 'com.android.application'
 apply plugin: 'save.state'
 ```
 
+If your module contains `kotlin` code， please make sure `kotlin-kapt` plugin is also included：
+```groovy
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'save.state'
+```
+
 If you have **library** modules and they also need SaveState support, then the only thing you need to do is applying the plugin in their `build.gradle` files just as the **application** module.
 
 ```groovy
 apply plugin: 'com.android.library'
 apply plugin: 'save.state'
 ```
+
+If this **library** module contains `kotlin` code，just follow the same tips in **application** module above：
+```groovy
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'save.state'
+```
+
+
+> Note：In pure Java module，SaveState use `annotationProcessor` by default;
+In module that contains `kotlin` code，then SaveState use `kotlin-kapt` instead.
+If you are using SaveState plugin in module that contains `kotlin` code,
+please make sure other annotation processor framework are using `kapt` plugin too.
+For example, Dagger and  DeepLinkDispatch processor should included like below：
+> ```groovy
+> kapt "com.google.dagger:dagger-compiler:${dagger_version}"
+> kapt "com.airbnb:deeplinkdispatch-processor:${deeplinkdispatch_version}"
+> ```
+
 
 ## Supported Types
 
@@ -148,38 +172,38 @@ then SaveState could still save and restore it automatically by serializing it t
 
 For example：
 
-```java
-public class User {
-    String name;
-    int age;
-}
+```kotlin
+class User (
+    val name: String,
+    val age: Int
+)
 
 
-public class NetworkResponse<T> {
-    int resultCode;
-
-    T data
-}
+class NetworkResponse<T> (
+    val resultCode: Int,
+    val data: T?
+)
 ```
 
 These types are supported by SaveState according to the rule above:
 
-```java
-public class MyActivity extends Activity {
+```kotlin
+class MyActivity : Activity() {
 
     @AutoRestore
-    User user;
+    var user: User? = null
 
     @AutoRestore
-    NetworkResponse<List<User>> response;
+    var response: NetworkResponse<List<User>>? = null
 }
 ```
 
 But we need extra configurations now：
 
 1. Make sure your have already included one of the dependencies of **supported `JSON` processing library** .
-2. Add compile options in the `build.gradle` file ( **application** module or  **library** module ) as below:
+2. Add compile options in the `build.gradle` file ( **application** module or  **library** module ),
 
+For pure Java modules:
 ```groovy
 defaultConfig {
 
@@ -194,6 +218,16 @@ defaultConfig {
 }
 ```
 
+For modules that contain `kotlin` code:
+```groovy
+kapt {
+    arguments {
+        arg("serializer", "/*JSON库*/")
+    }
+}
+```
+
+
 Currently the **supported `JSON` processing library** includes：
 
 + [gson](https://github.com/google/gson)
@@ -204,7 +238,7 @@ Currently the **supported `JSON` processing library** includes：
 
 + Q: Does SaveState support Instant Run?
 
-  A: Yes，it's based on Transform API, so no problem。
+  A: Yes，it's based on Transform API, so no problem.
 
 + Q: Do I need to add any Proguard rules for release?
 

@@ -15,20 +15,19 @@
 
 #### 在 Activity 中使用：
 
-```java
-public class MyActivity extends Activity {
+```kotlin
+class MyActivity : Activity() {
 
     @AutoRestore
-    int myInt;
+    var myInt: Int = 0;
 
     @AutoRestore
-    IBinder myRpcCall;
+    var myRpcCall: IBinder? = null;
 
     @AutoRestore
-    String result;
+    var result: String? = null;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         // Your code here
     }
 }
@@ -37,18 +36,16 @@ public class MyActivity extends Activity {
 #### 在 Fragment 中使用：
 
 
-```java
-public class MyFragment extends Fragment {
+```kotlin
+class MyFragment : Fragment() {
 
     @AutoRestore
-    User currentLoginUser;
+    var currentLoginUser: User? = null;
 
     @AutoRestore
-    List<Map<String, Object>> networkResponse;
+    var networkResponse: List<Map<String, Object>>? = null;
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Your code here
     }
 }
@@ -58,32 +55,31 @@ public class MyFragment extends Fragment {
 #### 在自定义 View 中使用：
 
 
-```java
-public class MyView extends View {
+```kotlin
+class KotlinView : FrameLayout {
 
     @AutoRestore
-    String someText;
+    val someText: String? = null;
 
     @AutoRestore
-    Size size;
+    val size: Size? = null;
 
     @AutoRestore
-    float[] myFloatArray;
+    val myFloatArray: FloatArray? = null;
 
-    public MyView(Context context) {
-        super(context);
+    constructor(context: Context) : super(context) {
+        // your code here
     }
 
-    public MyView(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        // your code here
     }
 
-    public MyView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+        // your code here
     }
 
 }
-
 ```
 
 没错，就这么简单，只需要在变量上标记 `@AutoRestore` 注解。
@@ -116,12 +112,39 @@ apply plugin: 'com.android.application'
 apply plugin: 'save.state'
 ```
 
+如果您的模块包含 `kotlin` 代码， 请确保 `kotlin-kapt` 插件也同步导入：
+```groovy
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'save.state'
+```
+
 如果你的项目中还有其他 **library** 模块也需要使用 SaveState，那么只需要在对应模块的 `build.gradle` 中也应用插件即可：
 
 ```groovy
 apply plugin: 'com.android.library'
 apply plugin: 'save.state'
 ```
+
+如果 **library** 模块也包含 `kotlin` 代码，那和 **application** 模块类似：
+```groovy
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'save.state'
+```
+
+
+> 注意事项：如果您的模块是纯 Java 模块，那么 SaveState 默认使用 `annotationProcessor`;
+而如果你的模块包含 `kotlin` 代码，那么 SaveState 则会在编译时使用 `kotlin-kapt` 插件。
+所以如果您的模块包含 `kotlin` 代码，同时又使用 SaveState 插件的情况下，
+请保证其他注解处理框架统一使用 `kapt` 插件。
+例如：Dagger, DeepLinkDispatch 的写法应改造为：
+> ```groovy
+> kapt "com.google.dagger:dagger-compiler:${dagger_version}"
+> kapt "com.airbnb:deeplinkdispatch-processor:${deeplinkdispatch_version}"
+> ```
 
 ## 支持的变量类型
 
@@ -146,37 +169,38 @@ boolean/Boolean        | String         |
 
 例如自定义对象：
 
-```java
-public class User {
-    String name;
-    int age;
-}
+```kotlin
+class User (
+    val name: String,
+    val age: Int
+)
 
 
-public class NetworkResponse<T> {
-    int resultCode;
-
-    T data
-}
+class NetworkResponse<T> (
+    val resultCode: Int,
+    val data: T?
+)
 ```
 
 类似这样的对象都可以通过 SaveState 来自动恢复：
 
-```java
-public class MyActivity extends Activity {
+```kotlin
+class MyActivity : Activity() {
 
     @AutoRestore
-    User user;
+    var user: User? = null
 
     @AutoRestore
-    NetworkResponse<List<User>> response;
+    var response: NetworkResponse<List<User>>? = null
 }
 ```
 
 额外的配置操作有：
 
 1. 确保项目中已引入 **支持的`JSON`序列化库** 之一
-2. 在模块( **com.android.application** / **com.android.library** )的 `build.gradle` 中加入配置：
+2. 在模块( **com.android.application** / **com.android.library** )的 `build.gradle` 中加入配置,
+
+如果是纯 Java 模块：
 ```groovy
 defaultConfig {
 
@@ -190,6 +214,16 @@ defaultConfig {
     }
 }
 ```
+
+如果是启用了 `kotlin` 的模块：
+```groovy
+kapt {
+    arguments {
+        arg("serializer", "/*JSON库*/")
+    }
+}
+```
+
 
 目前支持的 `JSON` 序列化库有：
 
