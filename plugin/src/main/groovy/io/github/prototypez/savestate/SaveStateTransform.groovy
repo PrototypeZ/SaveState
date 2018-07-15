@@ -28,7 +28,7 @@ class SaveStateTransform extends Transform {
 
     @Override
     Set<QualifiedContent.ContentType> getInputTypes() {
-        return Collections.singleton(QualifiedContent.DefaultContentType.CLASSES);
+        return Collections.singleton(QualifiedContent.DefaultContentType.CLASSES)
     }
 
     @Override
@@ -166,9 +166,17 @@ class SaveStateTransform extends Transform {
 
     boolean checkAndTransformClass(ClassPool classPool, File file, File dest) {
 
-        CtClass fragmentActivityCtClass = classPool.get("android.support.v4.app.FragmentActivity")
+        CtClass fragmentActivityCtClass
+        CtClass v4FragmentCtClass
+
+        try {
+            fragmentActivityCtClass = classPool.get("android.support.v4.app.FragmentActivity")
+            v4FragmentCtClass = classPool.get("android.support.v4.app.Fragment")
+        } catch (Throwable t) {
+            // It's ok
+        }
+
         CtClass activityCtClass = classPool.get("android.app.Activity")
-        CtClass v4FragmentCtClass = classPool.get("android.support.v4.app.Fragment")
         CtClass fragmentCtClass = classPool.get("android.app.Fragment")
         CtClass viewCtClass = classPool.get("android.view.View")
 
@@ -188,12 +196,12 @@ class SaveStateTransform extends Transform {
         }
         // Support Activity and AppCompatActivity
         boolean handled
-        if (ctClass.subclassOf(activityCtClass) || ctClass.subclassOf(fragmentActivityCtClass)) {
+        if (ctClass.subclassOf(activityCtClass) || (fragmentActivityCtClass != null && ctClass.subclassOf(fragmentActivityCtClass))) {
 //            mProject.logger.info("save-state checking activity class:" + ctClass.getName())
             ActivitySaveStateTransform transform = new ActivitySaveStateTransform(mProject, ctClass, classPool)
             transform.handleActivitySaveState()
             handled = true
-        } else if (ctClass.subclassOf(fragmentCtClass) || ctClass.subclassOf(v4FragmentCtClass)) {
+        } else if (ctClass.subclassOf(fragmentCtClass) || (v4FragmentCtClass != null && ctClass.subclassOf(v4FragmentCtClass))) {
 //            mProject.logger.info("save-state checking fragment class:" + ctClass.getName())
             FragmentSaveStateTransform transform = new FragmentSaveStateTransform(ctClass, classPool, mProject)
             transform.handleFragmentSaveState()

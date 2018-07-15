@@ -1,5 +1,5 @@
 group 'io.github.prototypez'
-version '0.1.6'
+version '0.1.7'
 
 apply plugin: 'groovy'
 apply plugin: 'maven'
@@ -20,7 +20,7 @@ publish {
     userOrg = 'prototypez'
     groupId = 'io.github.prototypez'
     artifactId = 'save-state'
-    publishVersion = '0.1.6'
+    publishVersion = '0.1.7'
     desc = 'SaveInstanceState for your application automatically'
     website = 'https://github.com/PrototypeZ/SaveState'
 }
@@ -31,8 +31,8 @@ dependencies {
     compile 'com.android.tools.build:gradle-api:3.0.0'
     compile 'javassist:javassist:3.12.1.GA'
     compile 'commons-io:commons-io:2.6'
-    compile project(':core')
-//    compile 'io.github.prototypez:save-state-core:0.1'
+//    compile project(':core')
+    compile 'io.github.prototypez:save-state-core:0.1'
 }
 
 uploadArchives {

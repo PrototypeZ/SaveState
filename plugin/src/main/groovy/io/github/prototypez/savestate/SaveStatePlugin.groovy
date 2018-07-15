@@ -14,7 +14,7 @@ class SaveStatePlugin implements Plugin<Project> {
             if (project.plugins.hasPlugin("kotlin-android")) {
                 project.dependencies {
                     implementation 'io.github.prototypez:save-state-core:0.1'
-                    kapt 'io.github.prototypez:save-state-processor:0.1.7'
+                    kapt 'io.github.prototypez:save-state-processor:0.1.8'
                 }
             } else {
                 project.dependencies {
