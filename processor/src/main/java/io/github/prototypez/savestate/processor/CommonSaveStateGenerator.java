@@ -11,10 +11,12 @@ import com.squareup.javapoet.TypeSpec;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.PackageElement;
+import javax.lang.model.util.Elements;
 
 import io.github.prototypez.savestate.core.annotation.AutoRestore;
 
@@ -28,11 +30,13 @@ public class CommonSaveStateGenerator implements Generator {
     protected Element element;
     protected String serializer;
     private boolean isKotlinClass;
+    private ProcessingEnvironment processingEnv;
 
-    public CommonSaveStateGenerator(boolean isKotlinClass, Element element, String serializer) {
+    public CommonSaveStateGenerator(ProcessingEnvironment processingEnv, boolean isKotlinClass, Element element, String serializer) {
         this.element = element;
         this.serializer = serializer;
-        this. isKotlinClass = isKotlinClass;
+        this.isKotlinClass = isKotlinClass;
+        this.processingEnv = processingEnv;
     }
 
     @Override
@@ -108,7 +112,7 @@ public class CommonSaveStateGenerator implements Generator {
                 .addModifiers(Modifier.STATIC);
 
         for (Element field : autoRestoreFields) {
-            BundleStateHelper.statementSaveValueIntoBundle(isKotlinClass, saveStateMethodBuilder,
+            BundleStateHelper.statementSaveValueIntoBundle(processingEnv, isKotlinClass, saveStateMethodBuilder,
                     field, "instance", "outState", serializer);
 
         }
@@ -122,7 +126,7 @@ public class CommonSaveStateGenerator implements Generator {
                 .addModifiers(Modifier.STATIC);
 
         for (Element field : autoRestoreFields) {
-            BundleStateHelper.statementGetValueFromBundle(isKotlinClass, restoreStateMethodBuilder,
+            BundleStateHelper.statementGetValueFromBundle(processingEnv, isKotlinClass, restoreStateMethodBuilder,
                     field, "instance", "savedInstanceState", serializer);
         }
 

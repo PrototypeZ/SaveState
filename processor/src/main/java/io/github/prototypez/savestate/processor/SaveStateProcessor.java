@@ -99,9 +99,9 @@ public class SaveStateProcessor extends AbstractProcessor {
                     element,
                     Constant.CLASS_ACTIVITY, Constant.CLASS_FRAGMENT_ACTIVITY,
                     Constant.CLASS_FRAGMENT, Constant.CLASS_V4_FRAGMENT)) {
-                generator = new CommonSaveStateGenerator(isKotlinClass, element, serializer);
+                generator = new CommonSaveStateGenerator(processingEnv, isKotlinClass, element, serializer);
             } else if (checkIsSubClassOf(element, Constant.CLASS_VIEW)) {
-                generator = new ViewSaveStateGenerator(isKotlinClass, element, serializer);
+                generator = new ViewSaveStateGenerator(processingEnv, isKotlinClass, element, serializer);
             } else {
                 continue;
             }
@@ -127,11 +127,16 @@ public class SaveStateProcessor extends AbstractProcessor {
         Elements elementUtils = processingEnv.getElementUtils();
         Types typeUtils = processingEnv.getTypeUtils();
         for (String clazz : superClasses) {
-            boolean isSubType = typeUtils.isSubtype(
-                    element.asType(),
-                    elementUtils.getTypeElement(clazz).asType()
-            );
-            if (isSubType) return true;
+            try {
+                boolean isSubType = typeUtils.isSubtype(
+                        element.asType(),
+                        elementUtils.getTypeElement(clazz).asType()
+                );
+                if (isSubType) return true;
+            } catch (Throwable throwable) {
+                messager.printMessage(Diagnostic.Kind.NOTE, "SaveState can not find class:" + throwable.getMessage());
+                continue;
+            }
         }
         return false;
     }

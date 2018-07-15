@@ -1,11 +1,15 @@
+group 'io.github.prototypez'
+version '0.1.8'
+
 apply plugin: 'java-library'
 apply plugin: 'com.novoda.bintray-release'
+apply plugin: 'maven'
 
 publish {
     userOrg = 'prototypez'
     groupId = 'io.github.prototypez'
     artifactId = 'save-state-processor'
-    publishVersion = '0.1.7'
+    publishVersion = '0.1.8'
     desc = 'SaveInstanceState for your application automatically'
     website = 'https://github.com/PrototypeZ/SaveState'
 }
@@ -18,8 +22,18 @@ dependencies {
     compile 'com.alibaba:fastjson:1.1.68.android'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.8.10'
     compile 'com.fasterxml.jackson.core:jackson-core:2.8.10'
-    compile project(':core')
+//    compile project(':core')
+    compile 'io.github.prototypez:save-state-core:0.1'
 }
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            pom.artifactId = 'save-state-processor'
+            repository(url: uri('../../repo'))
+        }
+    }
+}

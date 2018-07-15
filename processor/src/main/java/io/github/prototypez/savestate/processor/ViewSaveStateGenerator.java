@@ -7,16 +7,18 @@ import com.squareup.javapoet.TypeSpec;
 
 import java.util.List;
 
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.util.Elements;
 
 import static io.github.prototypez.savestate.processor.Constant.PARCELABLE_CLASS;
 import static io.github.prototypez.savestate.processor.Constant.SUPER_STATE;
 
 public class ViewSaveStateGenerator extends CommonSaveStateGenerator {
 
-    public ViewSaveStateGenerator(boolean isKotlinClass, Element element, String serializer) {
-        super(isKotlinClass, element, serializer);
+    public ViewSaveStateGenerator(ProcessingEnvironment processingEnv, boolean isKotlinClass, Element element, String serializer) {
+        super(processingEnv, isKotlinClass, element, serializer);
     }
 
     @Override
