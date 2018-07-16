@@ -222,7 +222,7 @@ For modules that contain `kotlin` code:
 ```groovy
 kapt {
     arguments {
-        arg("serializer", "/*JSON库*/")
+        arg("serializer", "/*Supported JSON processing library*/")
     }
 }
 ```
