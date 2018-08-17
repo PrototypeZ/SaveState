@@ -135,14 +135,16 @@ class SaveStateTransform extends Transform {
                     int pathBitLen = dirInput.file.toString().length()
 
                     def callback = { File it ->
-                        def path = "${it.toString().substring(pathBitLen)}"
-                        if (it.isDirectory()) {
-                            new File(outDir, path).mkdirs()
-                        } else {
-                            boolean handled = checkAndTransformClass(classPool, it, outDir)
-                            if (!handled) {
-                                // copy the file to output location
-                                new File(outDir, path).bytes = it.bytes
+                        if (it.exists()) {
+                            def path = "${it.toString().substring(pathBitLen)}"
+                            if (it.isDirectory()) {
+                                new File(outDir, path).mkdirs()
+                            } else {
+                                boolean handled = checkAndTransformClass(classPool, it, outDir)
+                                if (!handled) {
+                                    // copy the file to output location
+                                    new File(outDir, path).bytes = it.bytes
+                                }
                             }
                         }
                     }
