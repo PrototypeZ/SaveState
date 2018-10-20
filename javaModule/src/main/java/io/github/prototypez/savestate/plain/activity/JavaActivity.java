@@ -1,5 +1,6 @@
 package io.github.prototypez.savestate.plain.activity;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Point;
 import android.os.Build;
@@ -10,16 +11,13 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Size;
 import android.util.SizeF;
-
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-
 import io.github.prototypez.savestate.core.annotation.AutoRestore;
 import io.github.prototypez.savestate.plain.R;
 import io.github.prototypez.savestate.plain.databinding.ActivityJavaBinding;
 import io.github.prototypez.savestate.plain.entity.User;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 public class JavaActivity extends AppCompatActivity{
 
@@ -72,7 +70,7 @@ public class JavaActivity extends AppCompatActivity{
     Double testDouble2;
 
     @AutoRestore
-    Serializable serializable;
+    HashMap<String, String> serializable;
 
     @AutoRestore
     IBinder iBinder;
@@ -84,7 +82,7 @@ public class JavaActivity extends AppCompatActivity{
     CharSequence charSequence;
 
     @AutoRestore
-    Parcelable parcelable;
+    Intent parcelable;
 
     @AutoRestore
     Size size;
@@ -154,9 +152,7 @@ public class JavaActivity extends AppCompatActivity{
             charSequence = "testCharSequence";
             size = new Size(110, 120);
             sizeF = new SizeF(110.110f, 120.120f);
-            Bundle b = new Bundle();
-            b.putString("testParcelable", "testParcelable");
-            parcelable = b;
+            parcelable = new Intent("testParcelable");
             data = "testString";
 
             byteArray = new byte[]{1, 2, 3, 4};
@@ -198,7 +194,7 @@ public class JavaActivity extends AppCompatActivity{
         mBinding.aTestString.setText(String.valueOf(data));
         mBinding.aTestSize.setText(String.valueOf(size));
         mBinding.aTestSizeF.setText(String.valueOf(sizeF));
-        mBinding.aTestParcelable.setText(parcelable == null ? "null" : String.valueOf(((Bundle)parcelable).getString("testParcelable")));
+        mBinding.aTestParcelable.setText(parcelable == null ? "null" : String.valueOf((parcelable.getAction())));
 
         mBinding.aTestByteArray.setText(Arrays.toString(byteArray));
         mBinding.aTestCharArray.setText(Arrays.toString(charArray));
