@@ -7,18 +7,13 @@ import com.google.gson.reflect.TypeToken;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.MethodSpec;
-
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.util.List;
-
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
-import javax.tools.Diagnostic;
+import javax.lang.model.util.Types;
 
 import static io.github.prototypez.savestate.processor.Constant.SERIALIZER_FASTJSON;
 import static io.github.prototypez.savestate.processor.Constant.SERIALIZER_GSON;
@@ -26,380 +21,378 @@ import static io.github.prototypez.savestate.processor.Constant.SERIALIZER_JACKS
 
 class BundleStateHelper {
 
-    private static ClassName androidLogClassName = ClassName.get("android.util", "Log");
+  private static ClassName androidLogClassName = ClassName.get("android.util", "Log");
 
-    static MethodSpec.Builder statementSaveValueIntoBundle(ProcessingEnvironment processingEnv, boolean isKotlinClass, MethodSpec.Builder methodBuilder, Element element, String instance, String bundleName, String serializer) {
-        String statement = null;
-        String varName = element.getSimpleName().toString();
+  static MethodSpec.Builder statementSaveValueIntoBundle(ProcessingEnvironment processingEnv,
+      boolean isKotlinClass, MethodSpec.Builder methodBuilder, Element element, String instance,
+      String bundleName, String serializer) {
+    String statement = null;
+    String varName = element.getSimpleName().toString();
 
-        boolean isKotlinField = isKotlinClass && isKotlinField(processingEnv, element);
+    boolean isKotlinField = isKotlinClass && isKotlinField(processingEnv, element);
 
-        switch (element.asType().toString()) {
-            case "int":
-                statement = String.format("%s.putInt(%s, %s)", bundleName, "\"" + varName + "\"",
-                        getStatement(isKotlinField, instance, varName));
-                break;
-            case "long":
-                statement = String.format("%s.putLong(%s, %s)", bundleName, "\"" + varName + "\"",
-                        getStatement(isKotlinField, instance, varName));
-                break;
-            case "char":
-                statement = String.format("%s.putChar(%s, %s)", bundleName, "\"" + varName + "\"",
-                        getStatement(isKotlinField, instance, varName));
-                break;
-            case "short":
-                statement = String.format("%s.putShort(%s, %s)", bundleName, "\"" + varName + "\"",
-                        getStatement(isKotlinField, instance, varName));
-                break;
-            case "byte":
-                statement = String.format("%s.putByte(%s, %s)", bundleName, "\"" + varName + "\"",
-                        getStatement(isKotlinField, instance, varName));
-                break;
-            case "float":
-                statement = String.format("%s.putFloat(%s, %s)", bundleName, "\"" + varName + "\"",
-                        getStatement(isKotlinField, instance, varName));
-                break;
-            case "double":
-                statement = String.format("%s.putDouble(%s, %s)", bundleName, "\"" + varName + "\"",
-                        getStatement(isKotlinField, instance, varName));
-                break;
-            case "boolean":
-                statement = String.format("%s.putBoolean(%s, %s)", bundleName, "\"" + varName + "\"",
-                        getStatement(isKotlinField, instance, varName));
-                break;
-            case "java.lang.Integer":
-            case "java.lang.Long":
-            case "java.lang.Character":
-            case "java.lang.Short":
-            case "java.lang.Byte":
-            case "java.lang.Float":
-            case "java.lang.Double":
-            case "java.lang.Boolean":
-                statement = String.format("%s.putSerializable(%s, %s)", bundleName, "\"" + varName + "\"",
-                        getStatement(isKotlinField, instance, varName));
-                break;
-            case "java.lang.String":
-                statement = String.format("%s.putString(%s, %s)", bundleName, "\"" + varName + "\"",
-                        getStatement(isKotlinField, instance, varName));
-                break;
-            case "java.io.Serializable":
-                statement = String.format("%s.putSerializable(%s, %s)", bundleName, "\"" + varName + "\"",
-                        getStatement(isKotlinField, instance, varName));
-                break;
-            case "android.os.IBinder":
-                statement = String.format("%s.putBinder(%s, %s)", bundleName, "\"" + varName + "\"",
-                        getStatement(isKotlinField, instance, varName));
-                break;
-            case "android.os.Bundle":
-                statement = String.format("%s.putBundle(%s, %s)", bundleName, "\"" + varName + "\"",
-                        getStatement(isKotlinField, instance, varName));
-                break;
-            case "java.lang.CharSequence":
-                statement = String.format("%s.putCharSequence(%s, %s)", bundleName, "\"" + varName + "\"",
-                        getStatement(isKotlinField, instance, varName));
-                break;
-            case "android.os.Parcelable":
-                statement = String.format("%s.putParcelable(%s, %s)", bundleName, "\"" + varName + "\"",
-                        getStatement(isKotlinField, instance, varName));
-                break;
-            case "android.util.Size":
-                statement = String.format("%s.putSize(%s, %s)", bundleName, "\"" + varName + "\"",
-                        getStatement(isKotlinField, instance, varName));
-                break;
-            case "android.util.SizeF":
-                statement = String.format("%s.putSizeF(%s, %s)", bundleName, "\"" + varName + "\"",
-                        getStatement(isKotlinField, instance, varName));
-                break;
-            case "android.os.Parcelable[]":
-                statement = String.format("%s.putParcelableArray(%s, %s)", bundleName, "\"" + varName + "\"",
-                        getStatement(isKotlinField, instance, varName));
-                break;
-            case "byte[]":
-                statement = String.format("%s.putByteArray(%s, %s)", bundleName, "\"" + varName + "\"",
-                        getStatement(isKotlinField, instance, varName));
-                break;
-            case "short[]":
-                statement = String.format("%s.putShortArray(%s, %s)", bundleName, "\"" + varName + "\"",
-                        getStatement(isKotlinField, instance, varName));
-                break;
-            case "char[]":
-                statement = String.format("%s.putCharArray(%s, %s)", bundleName, "\"" + varName + "\"",
-                        getStatement(isKotlinField, instance, varName));
-                break;
-            case "float[]":
-                statement = String.format("%s.putFloatArray(%s, %s)", bundleName, "\"" + varName + "\"",
-                        getStatement(isKotlinField, instance, varName));
-                break;
-            case "java.lang.CharSequence[]":
-                statement = String.format("%s.putCharSequenceArray(%s, %s)", bundleName, "\"" + varName + "\"",
-                        getStatement(isKotlinField, instance, varName));
-                break;
-            default:
-                if (SERIALIZER_GSON.equals(serializer)) {
-                    statement = String.format(
-                            "%s.putString(%s, %s)",
-                            bundleName,
-                            "\"" + varName + "\"",
-                            "serializer.toJson(" + getStatement(isKotlinField, instance, varName) + ")"
-                    );
-                    methodBuilder.addStatement(statement);
-                    statement = null;
-                } else if (SERIALIZER_FASTJSON.equals(serializer)) {
-                    statement = String.format(
-                            "%s.putString(%s, %s)",
-                            bundleName,
-                            "\"" + varName + "\"",
-                            "$T.toJSONString(" + getStatement(isKotlinField, instance, varName) + ")"
-                    );
-                    methodBuilder.addStatement(statement, JSON.class);
-                    statement = null;
-                } else if (SERIALIZER_JACKSON.equals(serializer)) {
-                    methodBuilder.addCode(
-                            CodeBlock.builder()
-                                    .beginControlFlow("try")
-                                    .addStatement(
-                                            String.format(
-                                                    "%s.putString(%s, %s)",
-                                                    bundleName,
-                                                    "\"" + varName + "\"",
-                                                    "serializer.writeValueAsString(" + getStatement(isKotlinField, instance, varName) + ")"
-                                            )
-                                    )
-                                    .nextControlFlow("catch($T e)", JsonProcessingException.class)
-                                    .addStatement(String.format("$T.e(\"SaveState\", \"Error in saving field %s\", e)", varName), androidLogClassName)
-                                    .endControlFlow()
-                                    .build()
-                    );
-                }
-        }
-        if (statement != null) {
-            methodBuilder.addStatement(statement);
-        }
-        return methodBuilder;
+    switch (element.asType().toString()) {
+      case "int":
+        statement = String.format("%s.putInt(%s, %s)", bundleName, "\"" + varName + "\"",
+            getStatement(isKotlinField, instance, varName));
+        break;
+      case "long":
+        statement = String.format("%s.putLong(%s, %s)", bundleName, "\"" + varName + "\"",
+            getStatement(isKotlinField, instance, varName));
+        break;
+      case "char":
+        statement = String.format("%s.putChar(%s, %s)", bundleName, "\"" + varName + "\"",
+            getStatement(isKotlinField, instance, varName));
+        break;
+      case "short":
+        statement = String.format("%s.putShort(%s, %s)", bundleName, "\"" + varName + "\"",
+            getStatement(isKotlinField, instance, varName));
+        break;
+      case "byte":
+        statement = String.format("%s.putByte(%s, %s)", bundleName, "\"" + varName + "\"",
+            getStatement(isKotlinField, instance, varName));
+        break;
+      case "float":
+        statement = String.format("%s.putFloat(%s, %s)", bundleName, "\"" + varName + "\"",
+            getStatement(isKotlinField, instance, varName));
+        break;
+      case "double":
+        statement = String.format("%s.putDouble(%s, %s)", bundleName, "\"" + varName + "\"",
+            getStatement(isKotlinField, instance, varName));
+        break;
+      case "boolean":
+        statement = String.format("%s.putBoolean(%s, %s)", bundleName, "\"" + varName + "\"",
+            getStatement(isKotlinField, instance, varName));
+        break;
+      case "java.lang.Integer":
+      case "java.lang.Long":
+      case "java.lang.Character":
+      case "java.lang.Short":
+      case "java.lang.Byte":
+      case "java.lang.Float":
+      case "java.lang.Double":
+      case "java.lang.Boolean":
+        statement = String.format("%s.putSerializable(%s, %s)", bundleName, "\"" + varName + "\"",
+            getStatement(isKotlinField, instance, varName));
+        break;
+      case "java.lang.String":
+        statement = String.format("%s.putString(%s, %s)", bundleName, "\"" + varName + "\"",
+            getStatement(isKotlinField, instance, varName));
+        break;
+      case "java.io.Serializable":
+        statement = String.format("%s.putSerializable(%s, %s)", bundleName, "\"" + varName + "\"",
+            getStatement(isKotlinField, instance, varName));
+        break;
+      case "android.os.IBinder":
+        statement = String.format("%s.putBinder(%s, %s)", bundleName, "\"" + varName + "\"",
+            getStatement(isKotlinField, instance, varName));
+        break;
+      case "android.os.Bundle":
+        statement = String.format("%s.putBundle(%s, %s)", bundleName, "\"" + varName + "\"",
+            getStatement(isKotlinField, instance, varName));
+        break;
+      case "java.lang.CharSequence":
+        statement = String.format("%s.putCharSequence(%s, %s)", bundleName, "\"" + varName + "\"",
+            getStatement(isKotlinField, instance, varName));
+        break;
+      case "android.os.Parcelable":
+        statement = String.format("%s.putParcelable(%s, %s)", bundleName, "\"" + varName + "\"",
+            getStatement(isKotlinField, instance, varName));
+        break;
+      case "android.util.Size":
+        statement = String.format("%s.putSize(%s, %s)", bundleName, "\"" + varName + "\"",
+            getStatement(isKotlinField, instance, varName));
+        break;
+      case "android.util.SizeF":
+        statement = String.format("%s.putSizeF(%s, %s)", bundleName, "\"" + varName + "\"",
+            getStatement(isKotlinField, instance, varName));
+        break;
+      case "android.os.Parcelable[]":
+        statement =
+            String.format("%s.putParcelableArray(%s, %s)", bundleName, "\"" + varName + "\"",
+                getStatement(isKotlinField, instance, varName));
+        break;
+      case "byte[]":
+        statement = String.format("%s.putByteArray(%s, %s)", bundleName, "\"" + varName + "\"",
+            getStatement(isKotlinField, instance, varName));
+        break;
+      case "short[]":
+        statement = String.format("%s.putShortArray(%s, %s)", bundleName, "\"" + varName + "\"",
+            getStatement(isKotlinField, instance, varName));
+        break;
+      case "char[]":
+        statement = String.format("%s.putCharArray(%s, %s)", bundleName, "\"" + varName + "\"",
+            getStatement(isKotlinField, instance, varName));
+        break;
+      case "float[]":
+        statement = String.format("%s.putFloatArray(%s, %s)", bundleName, "\"" + varName + "\"",
+            getStatement(isKotlinField, instance, varName));
+        break;
+      case "java.lang.CharSequence[]":
+        statement =
+            String.format("%s.putCharSequenceArray(%s, %s)", bundleName, "\"" + varName + "\"",
+                getStatement(isKotlinField, instance, varName));
+        break;
     }
 
-    static MethodSpec.Builder statementGetValueFromBundle(ProcessingEnvironment processingEnv, boolean isKotlinClass, MethodSpec.Builder methodBuilder, Element element, String instance, String bundleName, String serializer) {
-        String statement = null;
-        String varName = element.getSimpleName().toString();
-        boolean isKotlinField = isKotlinClass && isKotlinField(processingEnv, element);
+    if (statement == null) {
 
-        switch (element.asType().toString()) {
-            case "int":
-                statement = assignStatement(isKotlinField, instance, varName,
-                        String.format("%s.getInt(%s)", bundleName, "\"" + varName + "\""));
-                break;
-            case "long":
-                statement = assignStatement(isKotlinField, instance, varName,
-                        String.format("%s.getLong(%s)", bundleName, "\"" + varName + "\""));
-                break;
-            case "char":
-                statement = assignStatement(isKotlinField, instance, varName,
-                        String.format("%s.getChar(%s)", bundleName, "\"" + varName + "\""));
-                break;
-            case "short":
-                statement = assignStatement(isKotlinField, instance, varName,
-                        String.format("%s.getShort(%s)", bundleName, "\"" + varName + "\""));
-                break;
-            case "byte":
-                statement = assignStatement(isKotlinField, instance, varName,
-                        String.format("%s.getByte(%s)", bundleName, "\"" + varName + "\""));
-                break;
-            case "float":
-                statement = assignStatement(isKotlinField, instance, varName,
-                        String.format("%s.getFloat(%s)", bundleName, "\"" + varName + "\""));
-                break;
-            case "double":
-                statement = assignStatement(isKotlinField, instance, varName,
-                        String.format("%s.getDouble(%s)", bundleName, "\"" + varName + "\""));
-                break;
-            case "boolean":
-                statement = assignStatement(isKotlinField, instance, varName,
-                        String.format("%s.getBoolean(%s)", bundleName, "\"" + varName + "\""));
-                break;
-            case "java.lang.Integer":
-            case "java.lang.Long":
-            case "java.lang.Character":
-            case "java.lang.Short":
-            case "java.lang.Byte":
-            case "java.lang.Float":
-            case "java.lang.Double":
-            case "java.lang.Boolean":
-                statement = assignStatement(isKotlinField, instance, varName,
-                        String.format(
-                                "(%s)%s.getSerializable(%s)",
-                                element.asType().toString(),
-                                bundleName, "\"" + varName + "\""
-                        )
-                );
-                break;
-            case "java.lang.String":
-                statement = assignStatement(isKotlinField, instance, varName,
-                        String.format("%s.getString(%s)", bundleName, "\"" + varName + "\""));
-                break;
-            case "java.io.Serializable":
-                statement = assignStatement(isKotlinField, instance, varName,
-                        String.format("%s.getSerializable(%s)", bundleName, "\"" + varName + "\""));
-                break;
-            case "android.os.IBinder":
-                statement = assignStatement(isKotlinField, instance, varName,
-                        String.format("%s.getBinder(%s)", bundleName, "\"" + varName + "\""));
-                break;
-            case "android.os.Bundle":
-                statement = assignStatement(isKotlinField, instance, varName,
-                        String.format("%s.getBundle(%s)", bundleName, "\"" + varName + "\""));
-                break;
-            case "java.lang.CharSequence":
-                statement = assignStatement(isKotlinField, instance, varName,
-                        String.format("%s.getCharSequence(%s)", bundleName, "\"" + varName + "\""));
-                break;
-            case "android.os.Parcelable":
-                statement = assignStatement(isKotlinField, instance, varName,
-                        String.format("%s.getParcelable(%s)", bundleName, "\"" + varName + "\""));
-                break;
-            case "android.util.Size":
-                statement = assignStatement(isKotlinField, instance, varName,
-                        String.format("%s.getSize(%s)", bundleName, "\"" + varName + "\""));
-                break;
-            case "android.util.SizeF":
-                statement = assignStatement(isKotlinField, instance, varName,
-                        String.format("%s.getSizeF(%s)", bundleName, "\"" + varName + "\""));
-                break;
-            case "android.os.Parcelable[]":
-                statement = assignStatement(isKotlinField, instance, varName,
-                        String.format("%s.getParcelableArray(%s)", bundleName, "\"" + varName + "\""));
-                break;
-            case "byte[]":
-                statement = assignStatement(isKotlinField, instance, varName,
-                        String.format("%s.getByteArray(%s)", bundleName, "\"" + varName + "\""));
-                break;
-            case "short[]":
-                statement = assignStatement(isKotlinField, instance, varName,
-                        String.format("%s.getShortArray(%s)", bundleName, "\"" + varName + "\""));
-                break;
-            case "char[]":
-                statement = assignStatement(isKotlinField, instance, varName,
-                        String.format("%s.getCharArray(%s)", bundleName, "\"" + varName + "\""));
-                break;
-            case "float[]":
-                statement = assignStatement(isKotlinField, instance, varName,
-                        String.format("%s.getFloatArray(%s)", bundleName, "\"" + varName + "\""));
-                break;
-            case "java.lang.CharSequence[]":
-                statement = assignStatement(isKotlinField, instance, varName,
-                        String.format("%s.getCharSequenceArray(%s)", bundleName, "\"" + varName + "\""));
-                break;
-            default:
-                if (SERIALIZER_GSON.equals(serializer)) {
-                    statement = assignStatement(isKotlinField, instance, varName, String.format(
-                            "serializer.<%s>fromJson(%s.getString(%s), new $T<%s>(){}.getType())",
-                            element.asType().toString(),
-                            bundleName,
-                            "\"" + varName + "\"",
-                            element.asType().toString()
-                    ));
-                    methodBuilder.addStatement(statement, TypeToken.class);
-                    statement = null;
-                } else if (SERIALIZER_FASTJSON.equals(serializer)) {
-                    statement = assignStatement(isKotlinField, instance, varName, String.format(
-                            "$T.<%s>parseObject(%s.getString(%s), new $T<%s>(){}.getType())",
-                            element.asType().toString(),
-                            bundleName,
-                            "\"" + varName + "\"",
-                            element.asType().toString()
-                    ));
-                    methodBuilder.addStatement(statement, JSON.class, TypeReference.class);
-                    statement = null;
-                } else if (SERIALIZER_JACKSON.equals(serializer)) {
-                    methodBuilder.addCode(
-                            CodeBlock.builder()
-                                    .beginControlFlow("try")
-                                    .addStatement(
-                                            assignStatement(isKotlinField, instance, varName,
-                                                    String.format(
-                                                            "serializer.<%s>readValue(%s.getString(%s), new $T<%s>(){})",
-                                                            element.asType().toString(),
-                                                            bundleName,
-                                                            "\"" + varName + "\"",
-                                                            element.asType().toString()
-                                                    )),
-                                            com.fasterxml.jackson.core.type.TypeReference.class
-                                    )
-                                    .nextControlFlow("catch($T e)", IOException.class)
-                                    .addStatement(String.format("$T.e(\"SaveState\", \"Error in restoring field %s\", e)", varName), androidLogClassName)
-                                    .endControlFlow()
-                                    .build()
-                    );
-                }
-        }
-        if (statement != null) {
-            methodBuilder.addStatement(statement);
-        }
-        return methodBuilder;
+      Types typeUtil = processingEnv.getTypeUtils();
+      Elements elementUtil = processingEnv.getElementUtils();
+
+      if (typeUtil.isSubtype(element.asType(),
+          elementUtil.getTypeElement("android.os.Parcelable").asType())) {
+        statement = String.format("%s.putParcelable(%s, %s)", bundleName, "\"" + varName + "\"",
+            getStatement(isKotlinField, instance, varName));
+      } else if (typeUtil.isSubtype(element.asType(),
+          elementUtil.getTypeElement("java.io.Serializable").asType())) {
+        statement = String.format("%s.putSerializable(%s, %s)", bundleName, "\"" + varName + "\"",
+            getStatement(isKotlinField, instance, varName));
+      }
     }
 
-    private static boolean isKotlinField(ProcessingEnvironment processEnv, Element element) {
-//        List<? extends AnnotationMirror> list = element.getAnnotationMirrors();
-//        processEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, element.getSimpleName().toString() + " kotlinAnnotations:" + list.size() + ":" + list.toString());
-//        for (int i = 0; i < list.size(); i++) {
-//            if ("kotlin.jvm.JvmField".equals(((TypeElement)list.get(i).getAnnotationType().asElement()).getQualifiedName().toString())) {
-//                return false;
-//            }
-//        }
-
-        List<? extends Element> testGetterAndSetters = element.getEnclosingElement().getEnclosedElements();
-        for (int i = 0; testGetterAndSetters != null && i < testGetterAndSetters.size(); i++) {
-            String getter = kotlinGetterForVar(element.getSimpleName().toString());
-            String setter = kotlinSetterForVar(element.getSimpleName().toString());
-            String testName = testGetterAndSetters.get(i).getSimpleName().toString();
-            if (testGetterAndSetters.get(i) instanceof ExecutableElement) {
-                if (getter.equals(testName) || setter.equals(testName)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+    if (statement == null) {
+      // custom types
+      if (SERIALIZER_GSON.equals(serializer)) {
+        statement = String.format("%s.putString(%s, %s)", bundleName, "\"" + varName + "\"",
+            "serializer.toJson(" + getStatement(isKotlinField, instance, varName) + ")");
+        methodBuilder.addStatement(statement);
+        statement = null;
+      } else if (SERIALIZER_FASTJSON.equals(serializer)) {
+        statement = String.format("%s.putString(%s, %s)", bundleName, "\"" + varName + "\"",
+            "$T.toJSONString(" + getStatement(isKotlinField, instance, varName) + ")");
+        methodBuilder.addStatement(statement, JSON.class);
+        statement = null;
+      } else if (SERIALIZER_JACKSON.equals(serializer)) {
+        methodBuilder.addCode(CodeBlock.builder()
+            .beginControlFlow("try")
+            .addStatement(String.format("%s.putString(%s, %s)", bundleName, "\"" + varName + "\"",
+                "serializer.writeValueAsString("
+                    + getStatement(isKotlinField, instance, varName)
+                    + ")"))
+            .nextControlFlow("catch($T e)", JsonProcessingException.class)
+            .addStatement(
+                String.format("$T.e(\"SaveState\", \"Error in saving field %s\", e)", varName),
+                androidLogClassName)
+            .endControlFlow()
+            .build());
+      }
     }
 
-    private static String kotlinSetterForVar(String var) {
-        if (var.startsWith("is")) {
-            return var.replaceFirst("is", "set");
-        } else {
-            return "set" + var.substring(0, 1).toUpperCase() +
-                    (var.length() > 1 ? var.substring(1) : "");
+    if (statement != null) {
+      methodBuilder.addStatement(statement);
+    }
+    return methodBuilder;
+  }
+
+  static MethodSpec.Builder statementGetValueFromBundle(ProcessingEnvironment processingEnv,
+      boolean isKotlinClass, MethodSpec.Builder methodBuilder, Element element, String instance,
+      String bundleName, String serializer) {
+    String statement = null;
+    String varName = element.getSimpleName().toString();
+    boolean isKotlinField = isKotlinClass && isKotlinField(processingEnv, element);
+
+    switch (element.asType().toString()) {
+      case "int":
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("%s.getInt(%s)", bundleName, "\"" + varName + "\""));
+        break;
+      case "long":
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("%s.getLong(%s)", bundleName, "\"" + varName + "\""));
+        break;
+      case "char":
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("%s.getChar(%s)", bundleName, "\"" + varName + "\""));
+        break;
+      case "short":
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("%s.getShort(%s)", bundleName, "\"" + varName + "\""));
+        break;
+      case "byte":
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("%s.getByte(%s)", bundleName, "\"" + varName + "\""));
+        break;
+      case "float":
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("%s.getFloat(%s)", bundleName, "\"" + varName + "\""));
+        break;
+      case "double":
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("%s.getDouble(%s)", bundleName, "\"" + varName + "\""));
+        break;
+      case "boolean":
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("%s.getBoolean(%s)", bundleName, "\"" + varName + "\""));
+        break;
+      case "java.lang.Integer":
+      case "java.lang.Long":
+      case "java.lang.Character":
+      case "java.lang.Short":
+      case "java.lang.Byte":
+      case "java.lang.Float":
+      case "java.lang.Double":
+      case "java.lang.Boolean":
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("(%s)%s.getSerializable(%s)", element.asType().toString(), bundleName,
+                "\"" + varName + "\""));
+        break;
+      case "java.lang.String":
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("%s.getString(%s)", bundleName, "\"" + varName + "\""));
+        break;
+      case "java.io.Serializable":
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("%s.getSerializable(%s)", bundleName, "\"" + varName + "\""));
+        break;
+      case "android.os.IBinder":
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("%s.getBinder(%s)", bundleName, "\"" + varName + "\""));
+        break;
+      case "android.os.Bundle":
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("%s.getBundle(%s)", bundleName, "\"" + varName + "\""));
+        break;
+      case "java.lang.CharSequence":
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("%s.getCharSequence(%s)", bundleName, "\"" + varName + "\""));
+        break;
+      case "android.os.Parcelable":
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("%s.getParcelable(%s)", bundleName, "\"" + varName + "\""));
+        break;
+      case "android.util.Size":
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("%s.getSize(%s)", bundleName, "\"" + varName + "\""));
+        break;
+      case "android.util.SizeF":
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("%s.getSizeF(%s)", bundleName, "\"" + varName + "\""));
+        break;
+      case "android.os.Parcelable[]":
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("%s.getParcelableArray(%s)", bundleName, "\"" + varName + "\""));
+        break;
+      case "byte[]":
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("%s.getByteArray(%s)", bundleName, "\"" + varName + "\""));
+        break;
+      case "short[]":
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("%s.getShortArray(%s)", bundleName, "\"" + varName + "\""));
+        break;
+      case "char[]":
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("%s.getCharArray(%s)", bundleName, "\"" + varName + "\""));
+        break;
+      case "float[]":
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("%s.getFloatArray(%s)", bundleName, "\"" + varName + "\""));
+        break;
+      case "java.lang.CharSequence[]":
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("%s.getCharSequenceArray(%s)", bundleName, "\"" + varName + "\""));
+        break;
+      default:
+        if (SERIALIZER_GSON.equals(serializer)) {
+          statement = assignStatement(isKotlinField, instance, varName,
+              String.format("serializer.<%s>fromJson(%s.getString(%s), new $T<%s>(){}.getType())",
+                  element.asType().toString(), bundleName, "\"" + varName + "\"",
+                  element.asType().toString()));
+          methodBuilder.addStatement(statement, TypeToken.class);
+          statement = null;
+        } else if (SERIALIZER_FASTJSON.equals(serializer)) {
+          statement = assignStatement(isKotlinField, instance, varName,
+              String.format("$T.<%s>parseObject(%s.getString(%s), new $T<%s>(){}.getType())",
+                  element.asType().toString(), bundleName, "\"" + varName + "\"",
+                  element.asType().toString()));
+          methodBuilder.addStatement(statement, JSON.class, TypeReference.class);
+          statement = null;
+        } else if (SERIALIZER_JACKSON.equals(serializer)) {
+          methodBuilder.addCode(CodeBlock.builder()
+              .beginControlFlow("try")
+              .addStatement(assignStatement(isKotlinField, instance, varName,
+                  String.format("serializer.<%s>readValue(%s.getString(%s), new $T<%s>(){})",
+                      element.asType().toString(), bundleName, "\"" + varName + "\"",
+                      element.asType().toString())),
+                  com.fasterxml.jackson.core.type.TypeReference.class)
+              .nextControlFlow("catch($T e)", IOException.class)
+              .addStatement(
+                  String.format("$T.e(\"SaveState\", \"Error in restoring field %s\", e)", varName),
+                  androidLogClassName)
+              .endControlFlow()
+              .build());
         }
     }
+    if (statement != null) {
+      methodBuilder.addStatement(statement);
+    }
+    return methodBuilder;
+  }
 
-    private static String kotlinGetterForVar(String var) {
-        if (var.startsWith("is")) {
-            return var;
-        } else {
-            return "get" + var.substring(0, 1).toUpperCase() +
-                    (var.length() > 1 ? var.substring(1) : "");
+  private static boolean isKotlinField(ProcessingEnvironment processEnv, Element element) {
+    //        List<? extends AnnotationMirror> list = element.getAnnotationMirrors();
+    //        processEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, element.getSimpleName().toString() + " kotlinAnnotations:" + list.size() + ":" + list.toString());
+    //        for (int i = 0; i < list.size(); i++) {
+    //            if ("kotlin.jvm.JvmField".equals(((TypeElement)list.get(i).getAnnotationType().asElement()).getQualifiedName().toString())) {
+    //                return false;
+    //            }
+    //        }
+
+    List<? extends Element> testGetterAndSetters =
+        element.getEnclosingElement().getEnclosedElements();
+    for (int i = 0; testGetterAndSetters != null && i < testGetterAndSetters.size(); i++) {
+      String getter = kotlinGetterForVar(element.getSimpleName().toString());
+      String setter = kotlinSetterForVar(element.getSimpleName().toString());
+      String testName = testGetterAndSetters.get(i).getSimpleName().toString();
+      if (testGetterAndSetters.get(i) instanceof ExecutableElement) {
+        if (getter.equals(testName) || setter.equals(testName)) {
+          return true;
         }
+      }
     }
+    return false;
+  }
 
-    private static String javaAssignStatement(String instance, String field, String value) {
-        return String.format("%s.%s = %s", instance, field, value);
+  private static String kotlinSetterForVar(String var) {
+    if (var.startsWith("is")) {
+      return var.replaceFirst("is", "set");
+    } else {
+      return "set" + var.substring(0, 1).toUpperCase() + (var.length() > 1 ? var.substring(1) : "");
     }
+  }
 
-    private static String kotlinAssignStatement(String instance, String field, String value) {
-        return String.format("%s.%s(%s)", instance, kotlinSetterForVar(field), value);
+  private static String kotlinGetterForVar(String var) {
+    if (var.startsWith("is")) {
+      return var;
+    } else {
+      return "get" + var.substring(0, 1).toUpperCase() + (var.length() > 1 ? var.substring(1) : "");
     }
+  }
 
-    private static String assignStatement(boolean isKotlinField, String instance, String field, String value) {
-        return isKotlinField ? kotlinAssignStatement(instance, field, value)
-                : javaAssignStatement(instance, field, value);
-    }
+  private static String javaAssignStatement(String instance, String field, String value) {
+    return String.format("%s.%s = %s", instance, field, value);
+  }
 
-    private static String javaGetStatement(String instance, String field) {
-        return String.format("%s.%s", instance, field);
-    }
+  private static String kotlinAssignStatement(String instance, String field, String value) {
+    return String.format("%s.%s(%s)", instance, kotlinSetterForVar(field), value);
+  }
 
-    private static String kotlinGetStatement(String instance, String field) {
-        return String.format("%s.%s()", instance, kotlinGetterForVar(field));
-    }
+  private static String assignStatement(boolean isKotlinField, String instance, String field,
+      String value) {
+    return isKotlinField ? kotlinAssignStatement(instance, field, value)
+        : javaAssignStatement(instance, field, value);
+  }
 
-    private static String getStatement(boolean isKotlinField, String instance, String field) {
-        return isKotlinField ? kotlinGetStatement(instance, field) : javaGetStatement(instance, field);
-    }
+  private static String javaGetStatement(String instance, String field) {
+    return String.format("%s.%s", instance, field);
+  }
+
+  private static String kotlinGetStatement(String instance, String field) {
+    return String.format("%s.%s()", instance, kotlinGetterForVar(field));
+  }
+
+  private static String getStatement(boolean isKotlinField, String instance, String field) {
+    return isKotlinField ? kotlinGetStatement(instance, field) : javaGetStatement(instance, field);
+  }
 }

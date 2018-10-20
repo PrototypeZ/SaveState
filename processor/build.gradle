@@ -1,5 +1,5 @@
 group 'io.github.prototypez'
-version '0.1.8'
+version '0.2'
 
 apply plugin: 'java-library'
 apply plugin: 'com.novoda.bintray-release'
@@ -9,7 +9,7 @@ publish {
     userOrg = 'prototypez'
     groupId = 'io.github.prototypez'
     artifactId = 'save-state-processor'
-    publishVersion = '0.1.8'
+    publishVersion = '0.2'
     desc = 'SaveInstanceState for your application automatically'
     website = 'https://github.com/PrototypeZ/SaveState'
 }
