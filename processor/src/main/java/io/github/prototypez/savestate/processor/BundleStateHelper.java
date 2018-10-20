@@ -293,37 +293,58 @@ class BundleStateHelper {
         statement = assignStatement(isKotlinField, instance, varName,
             String.format("%s.getCharSequenceArray(%s)", bundleName, "\"" + varName + "\""));
         break;
-      default:
-        if (SERIALIZER_GSON.equals(serializer)) {
-          statement = assignStatement(isKotlinField, instance, varName,
-              String.format("serializer.<%s>fromJson(%s.getString(%s), new $T<%s>(){}.getType())",
-                  element.asType().toString(), bundleName, "\"" + varName + "\"",
-                  element.asType().toString()));
-          methodBuilder.addStatement(statement, TypeToken.class);
-          statement = null;
-        } else if (SERIALIZER_FASTJSON.equals(serializer)) {
-          statement = assignStatement(isKotlinField, instance, varName,
-              String.format("$T.<%s>parseObject(%s.getString(%s), new $T<%s>(){}.getType())",
-                  element.asType().toString(), bundleName, "\"" + varName + "\"",
-                  element.asType().toString()));
-          methodBuilder.addStatement(statement, JSON.class, TypeReference.class);
-          statement = null;
-        } else if (SERIALIZER_JACKSON.equals(serializer)) {
-          methodBuilder.addCode(CodeBlock.builder()
-              .beginControlFlow("try")
-              .addStatement(assignStatement(isKotlinField, instance, varName,
-                  String.format("serializer.<%s>readValue(%s.getString(%s), new $T<%s>(){})",
-                      element.asType().toString(), bundleName, "\"" + varName + "\"",
-                      element.asType().toString())),
-                  com.fasterxml.jackson.core.type.TypeReference.class)
-              .nextControlFlow("catch($T e)", IOException.class)
-              .addStatement(
-                  String.format("$T.e(\"SaveState\", \"Error in restoring field %s\", e)", varName),
-                  androidLogClassName)
-              .endControlFlow()
-              .build());
-        }
     }
+
+    if (statement == null) {
+      Types typeUtil = processingEnv.getTypeUtils();
+      Elements elementUtil = processingEnv.getElementUtils();
+
+      if (typeUtil.isSubtype(element.asType(),
+          elementUtil.getTypeElement("android.os.Parcelable").asType())) {
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("(%s)%s.getParcelable(%s)", element.asType().toString(), bundleName,
+                "\"" + varName + "\""));
+
+      } else if (typeUtil.isSubtype(element.asType(),
+          elementUtil.getTypeElement("java.io.Serializable").asType())) {
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("(%s)%s.getSerializable(%s)", element.asType().toString(), bundleName,
+                "\"" + varName + "\""));
+      }
+    }
+
+    if (statement == null) {
+      if (SERIALIZER_GSON.equals(serializer)) {
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("serializer.<%s>fromJson(%s.getString(%s), new $T<%s>(){}.getType())",
+                element.asType().toString(), bundleName, "\"" + varName + "\"",
+                element.asType().toString()));
+        methodBuilder.addStatement(statement, TypeToken.class);
+        statement = null;
+      } else if (SERIALIZER_FASTJSON.equals(serializer)) {
+        statement = assignStatement(isKotlinField, instance, varName,
+            String.format("$T.<%s>parseObject(%s.getString(%s), new $T<%s>(){}.getType())",
+                element.asType().toString(), bundleName, "\"" + varName + "\"",
+                element.asType().toString()));
+        methodBuilder.addStatement(statement, JSON.class, TypeReference.class);
+        statement = null;
+      } else if (SERIALIZER_JACKSON.equals(serializer)) {
+        methodBuilder.addCode(CodeBlock.builder()
+            .beginControlFlow("try")
+            .addStatement(assignStatement(isKotlinField, instance, varName,
+                String.format("serializer.<%s>readValue(%s.getString(%s), new $T<%s>(){})",
+                    element.asType().toString(), bundleName, "\"" + varName + "\"",
+                    element.asType().toString())),
+                com.fasterxml.jackson.core.type.TypeReference.class)
+            .nextControlFlow("catch($T e)", IOException.class)
+            .addStatement(
+                String.format("$T.e(\"SaveState\", \"Error in restoring field %s\", e)", varName),
+                androidLogClassName)
+            .endControlFlow()
+            .build());
+      }
+    }
+
     if (statement != null) {
       methodBuilder.addStatement(statement);
     }
