@@ -149,10 +149,11 @@ class SaveStateTransform extends Transform {
                         }
                     }
 
-                    if (dirInput.changedFiles == null || dirInput.changedFiles.isEmpty()) {
-                        dirInput.file.traverse(callback)
-                    } else {
+                    if (dirInput.changedFiles != null && dirInput.changedFiles.isEmpty()) {
                         dirInput.changedFiles.keySet().each(callback)
+                    }
+                    if (dirInput.file != null && dirInput.file.exists() && dirInput.file.isDirectory()) {
+                        dirInput.file.traverse(callback)
                     }
                 }
             }
