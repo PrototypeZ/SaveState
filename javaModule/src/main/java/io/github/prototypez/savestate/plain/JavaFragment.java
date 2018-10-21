@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -77,7 +78,7 @@ public class JavaFragment extends Fragment {
     Double testDouble2;
 
     @AutoRestore
-    Serializable serializable;
+    File serializable;
 
     @AutoRestore
     IBinder iBinder;
@@ -189,7 +190,7 @@ public class JavaFragment extends Fragment {
             testFloat2 = 2.0f;
             testDouble = 3.0;
             testDouble2 = 4.0;
-            serializable = new HashMap<String,String>(){{put("key", "value");}};
+            serializable = new File("serializableFile");
 //            iBinder =
             bundle = new Bundle();
             bundle.putString("testBundle", "stringInBundle");

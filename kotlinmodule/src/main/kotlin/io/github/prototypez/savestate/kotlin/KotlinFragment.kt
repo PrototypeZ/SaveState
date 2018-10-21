@@ -21,6 +21,7 @@ import java.util.HashMap
 import io.github.prototypez.savestate.core.annotation.AutoRestore
 import io.github.prototypez.savestate.kotlin.databinding.FragmentKotlinBinding
 import io.github.prototypez.savestate.kotlin.entity.Response
+import java.io.File
 
 class KotlinFragment : Fragment() {
 
@@ -74,7 +75,7 @@ class KotlinFragment : Fragment() {
     var testDouble2: Double? = null
 
     @AutoRestore
-    var serializable: Serializable? = null
+    var serializable: File? = null
 
     @AutoRestore
     var iBinder: IBinder? = null
@@ -184,11 +185,7 @@ class KotlinFragment : Fragment() {
             testFloat2 = 2.0f
             testDouble = 3.0
             testDouble2 = 4.0
-            serializable = object : HashMap<String, String>() {
-                init {
-                    put("key", "value")
-                }
-            }
+            serializable = File("serializableFile")
             //            iBinder =
             bundle = Bundle()
             bundle!!.putString("testBundle", "stringInBundle")

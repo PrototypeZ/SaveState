@@ -15,9 +15,8 @@ import android.util.SizeF;
 import android.view.LayoutInflater;
 import android.widget.FrameLayout;
 
-import java.io.Serializable;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
 
 import io.github.prototypez.savestate.core.annotation.AutoRestore;
@@ -75,7 +74,7 @@ public class JavaView extends FrameLayout {
     Double testDouble2;
 
     @AutoRestore
-    Serializable serializable;
+    Date serializable;
 
     @AutoRestore
     IBinder iBinder;
@@ -203,7 +202,7 @@ public class JavaView extends FrameLayout {
             testFloat2 = 2.0f;
             testDouble = 3.0;
             testDouble2 = 4.0;
-            serializable = new HashMap<String,String>(){{put("key", "value");}};
+            serializable = new Date();
 //            iBinder =
             bundle = new Bundle();
             bundle.putString("testBundle", "stringInBundle");

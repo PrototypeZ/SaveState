@@ -71,7 +71,7 @@ class KotlinActivity : AppCompatActivity() {
     var testDouble2: Double? = null
 
     @AutoRestore
-    var serializable: Serializable? = null
+    var serializable: HashMap<String, String>? = null
 
     @AutoRestore
     var iBinder: IBinder? = null
@@ -129,7 +129,7 @@ class KotlinActivity : AppCompatActivity() {
         refresh()
         Response::class.javaObjectType
 
-        mBinding.assignValue.setOnClickListener({ _ ->
+        mBinding.assignValue.setOnClickListener { _ ->
             testInt = 1
             testInt2 = 2
             testLong = 1000
@@ -174,7 +174,7 @@ class KotlinActivity : AppCompatActivity() {
             responseList = Arrays.asList(Response(500), Response(404))
 
             refresh()
-        })
+        }
     }
 
     private fun refresh() {

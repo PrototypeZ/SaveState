@@ -15,12 +15,12 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 
 import java.io.Serializable
-import java.util.Arrays
-import java.util.HashMap
 
 import io.github.prototypez.savestate.core.annotation.AutoRestore
 import io.github.prototypez.savestate.kotlin.databinding.ViewKotlinBinding
 import io.github.prototypez.savestate.kotlin.entity.Response
+import java.lang.StringBuilder
+import java.util.*
 
 class KotlinView : FrameLayout {
 
@@ -73,7 +73,7 @@ class KotlinView : FrameLayout {
     var testDouble2: Double? = null
 
     @AutoRestore
-    var serializable: Serializable? = null
+    var serializable: Date? = null
 
     @AutoRestore
     var iBinder: IBinder? = null
@@ -181,7 +181,7 @@ class KotlinView : FrameLayout {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private fun init(context: Context) {
         mBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.view_kotlin, this, true)
-        mBinding.assignValue.setOnClickListener({ _ ->
+        mBinding.assignValue.setOnClickListener { _ ->
             testInt = 1
             testInt2 = 2
             testLong = 1000
@@ -198,11 +198,7 @@ class KotlinView : FrameLayout {
             testFloat2 = 2.0f
             testDouble = 3.0
             testDouble2 = 4.0
-            serializable = object : HashMap<String, String>() {
-                init {
-                    put("key", "value")
-                }
-            }
+            serializable = Date()
             //            iBinder =
             bundle = Bundle()
             bundle!!.putString("testBundle", "stringInBundle")
@@ -226,7 +222,7 @@ class KotlinView : FrameLayout {
             responseList = Arrays.asList(Response(500), Response(404))
 
             refresh()
-        })
+        }
         post { this.refresh() }
     }
 }
